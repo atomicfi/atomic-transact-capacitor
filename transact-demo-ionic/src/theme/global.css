@@ -1,0 +1,166 @@
+/* Atomic Transact Demo — Global Styles */
+
+ion-card {
+  border-radius: 12px;
+}
+
+ion-content {
+  --padding-top: 8px;
+  --padding-bottom: 24px;
+  --padding-start: 0px;
+  --padding-end: 0px;
+}
+
+/* Section headers — small uppercase like iOS grouped list style.
+   Uses !important to override Ionic's high-specificity scoped iOS styles. */
+ion-list-header {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  min-height: 0 !important;
+  padding-top: 0px !important;
+  padding-bottom: 4px !important;
+}
+
+/* Form footer (Preview + Launch buttons) — pinned to bottom via IonFooter */
+.form-footer {
+  padding: 12px 16px;
+  padding-bottom: calc(12px + var(--ion-safe-area-bottom, 0px));
+  background: var(--ion-background-color, #fff);
+}
+
+/* Launch button */
+.launch-button {
+  --border-radius: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  height: 48px;
+  margin-top: 16px;
+}
+
+/* Pill group */
+.pill-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.pill-button {
+  --border-radius: 20px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  height: 36px;
+}
+
+.pill-button.pill-selected {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
+}
+
+.pill-button.pill-unselected {
+  --background: var(--ion-color-light);
+  --color: var(--ion-color-light-contrast);
+}
+
+@media (prefers-color-scheme: dark) {
+  .pill-button.pill-unselected {
+    --background: #2c2c2e;
+    --color: #ebebf5;
+  }
+}
+
+/* Token warning — align with 16px inset list margins */
+.token-warning {
+  --background: var(--ion-color-warning);
+  --color: #000;
+  border-radius: 10px;
+  margin: 16px 16px 0;
+}
+
+.token-warning ion-card-content {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Event log */
+.event-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.event-timestamp {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  font-family: monospace;
+}
+
+.event-json {
+  font-family: monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: var(--ion-color-light);
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+  .event-json {
+    background: #000000;
+  }
+}
+
+/* Config preview modal */
+.config-json {
+  font-family: monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  padding: 16px;
+  line-height: 1.5;
+}
+
+/* Inset accordion — matches IonList inset styling */
+.accordion-inset {
+  margin: 16px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.accordion-inset .ion-padding {
+  padding: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .accordion-inset {
+    border: 1px solid #38383a;
+  }
+}
+
+/* Metadata editor */
+.metadata-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.metadata-row ion-input {
+  flex: 1;
+}
