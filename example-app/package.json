@@ -16,8 +16,8 @@
     "build:android": "npm run build && npx cap sync android",
     "open:ios": "npx cap open ios",
     "open:android": "npx cap open android",
-    "run:ios": "npm run build:plugin && npm run build:ios && npx cap run ios",
-    "run:android": "npm run build:plugin && npm run build:android && npx cap run android",
+    "ios": "npm run build:plugin && npm run build:ios && npx cap run ios",
+    "android": "npm run build:plugin && npm run build:android && npx cap run android",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -17,10 +17,10 @@ From the `example-app/` directory:
 npm install
 
 # Build everything and run on iOS
-npm run run:ios
+npm run ios
 
 # Build everything and run on Android
-npm run run:android
+npm run android
 ```
 
 These commands will build the plugin, build the web assets, sync to native, and launch on a device or simulator — all in one step.
@@ -37,8 +37,8 @@ These commands will build the plugin, build the web assets, sync to native, and 
 | `npm run build:android` | Build web assets + sync to Android |
 | `npm run open:ios` | Open the iOS project in Xcode |
 | `npm run open:android` | Open the Android project in Android Studio |
-| `npm run run:ios` | Full build (plugin + web + sync) and run on iOS |
-| `npm run run:android` | Full build (plugin + web + sync) and run on Android |
+| `npm run ios` | Full build (plugin + web + sync) and run on iOS |
+| `npm run android` | Full build (plugin + web + sync) and run on Android |
 
 ## Setup (Manual)
 
@@ -79,7 +79,7 @@ Select a simulator or device and run from Xcode / Android Studio.
 When making changes to the plugin or the example app:
 
 1. Make your changes
-2. Run `npm run run:ios` (or `run:android`) to rebuild everything and launch
+2. Run `npm run ios` (or `android`) to rebuild everything and launch
 
 For web-only iteration, you can use the Vite dev server:
 
