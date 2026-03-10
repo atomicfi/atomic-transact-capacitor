@@ -221,10 +221,15 @@ class TransactPluginPlugin : Plugin() {
 
         var card: Config.TransactDataResponse.CardData? = null
         if (cardObj != null) {
+            val number = cardObj.getString("number")
+            if (number == null) {
+                call.reject("Card number is required")
+                return
+            }
             card = Config.TransactDataResponse.CardData(
-                number = cardObj.getString("number"),
-                expiry = if (cardObj.has("expiry") && !cardObj.isNull("expiry")) cardObj.getString("expiry") else null,
-                cvv = if (cardObj.has("cvv") && !cardObj.isNull("cvv")) cardObj.getString("cvv") else null
+                number = number,
+                expiry = cardObj.optStringOrNull("expiry"),
+                cvv = cardObj.optStringOrNull("cvv")
             )
         }
 
