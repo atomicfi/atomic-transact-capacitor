@@ -10,14 +10,16 @@ let package = Package(
             targets: ["TransactPluginPlugin"])
     ],
     dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "8.0.0")
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "8.0.0"),
+        .package(url: "https://github.com/atomicfi/atomic-transact-ios.git", from: "3.27.0")
     ],
     targets: [
         .target(
             name: "TransactPluginPlugin",
             dependencies: [
                 .product(name: "Capacitor", package: "capacitor-swift-pm"),
-                .product(name: "Cordova", package: "capacitor-swift-pm")
+                .product(name: "Cordova", package: "capacitor-swift-pm"),
+                .product(name: "AtomicTransact", package: "atomic-transact-ios")
             ],
             path: "ios/Sources/TransactPluginPlugin"),
         .testTarget(

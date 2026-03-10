@@ -2,14 +2,13 @@ import XCTest
 @testable import TransactPluginPlugin
 
 class TransactPluginTests: XCTestCase {
-    func testEcho() {
-        // This is an example of a functional test case for a plugin.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testPluginMethodsRegistered() {
+        let plugin = TransactPluginPlugin()
+        let methodNames = plugin.pluginMethods.map { $0.name }
 
-        let implementation = TransactPlugin()
-        let value = "Hello, World!"
-        let result = implementation.echo(value)
-
-        XCTAssertEqual(value, result)
+        XCTAssertTrue(methodNames.contains("presentTransact"))
+        XCTAssertTrue(methodNames.contains("presentAction"))
+        XCTAssertTrue(methodNames.contains("hideTransact"))
+        XCTAssertTrue(methodNames.contains("resolveDataRequest"))
     }
 }
