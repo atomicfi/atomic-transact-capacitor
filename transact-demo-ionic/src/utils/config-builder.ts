@@ -7,6 +7,7 @@ import type {
   ScopeType,
   StepType,
 } from '@atomicfi/transact-capacitor';
+
 import type { Settings } from '../providers/SettingsProvider';
 
 // ── PayLink config ───────────────────────────────────────────────────────────

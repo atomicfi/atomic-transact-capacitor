@@ -1,10 +1,7 @@
-import { useCallback } from 'react';
 import { TransactPlugin } from '@atomicfi/transact-capacitor';
-import type {
-  TransactConfig,
-  TransactEnvironment,
-  PresentTransactOptions,
-} from '@atomicfi/transact-capacitor';
+import type { TransactConfig, TransactEnvironment, PresentTransactOptions } from '@atomicfi/transact-capacitor';
+import { useCallback } from 'react';
+
 import { useSettings } from './useSettings';
 
 interface UseTransactReturn {
