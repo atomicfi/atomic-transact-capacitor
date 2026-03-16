@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { useMemo } from 'react';
 
 interface PlatformInfo {
   isIOS: boolean;
