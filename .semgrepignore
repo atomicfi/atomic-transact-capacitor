@@ -1,4 +1,5 @@
 example-app/
+ios/frameworks/
 
 # Common large paths
 node_modules/
