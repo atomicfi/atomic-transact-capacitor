@@ -4,18 +4,28 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
+    allow:
+      - dependency-name: 'atomicfi/atomic-transact-ios'
 
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
       interval: 'weekly'
+    allow:
+      - dependency-name: '@capacitor/core'
 
   - package-ecosystem: 'gradle'
     directory: '/android'
     schedule:
       interval: 'daily'
+    allow:
+      - dependency-name: 'financial.atomic:transact'
 
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
       interval: 'weekly'
+    groups:
+      github-actions:
+        patterns:
+          - '*'
