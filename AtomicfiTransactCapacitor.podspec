@@ -13,6 +13,10 @@ Pod::Spec.new do |s|
   s.source_files = 'ios/Sources/**/*.{swift,h,m,c,cc,mm,cpp}'
   s.ios.deployment_target = '15.0'
   s.dependency 'Capacitor'
-  s.dependency 'AtomicSDK', '~> 3.26'
+  s.vendored_frameworks = [
+    "ios/frameworks/AtomicTransact.xcframework",
+    "ios/frameworks/MuppetIOS.xcframework",
+    "ios/frameworks/QuantumIOS.xcframework"
+  ]
   s.swift_version = '5.1'
 end
