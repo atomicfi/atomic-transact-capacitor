@@ -1,0 +1,24 @@
+{
+  "originHash" : "614f1b5b6c1cb725c80662a83a4c7e1ad70eb00768da09ddd4199fbba8c82235",
+  "pins" : [
+    {
+      "identity" : "atomic-transact-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/atomicfi/atomic-transact-ios.git",
+      "state" : {
+        "revision" : "a61c90f2eda75d6b985512e225354857a64017a5",
+        "version" : "3.27.1"
+      }
+    },
+    {
+      "identity" : "capacitor-swift-pm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ionic-team/capacitor-swift-pm.git",
+      "state" : {
+        "revision" : "596259033e94829dffc552a40e7129262122995e",
+        "version" : "8.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}
