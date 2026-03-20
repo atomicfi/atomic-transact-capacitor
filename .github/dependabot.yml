@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: 'daily'
     allow:
-      - dependency-name: 'atomic-transact-ios'
+      - dependency-name: 'github.com/atomicfi/atomic-transact-ios'
 
   - package-ecosystem: 'npm'
     directory: '/'
