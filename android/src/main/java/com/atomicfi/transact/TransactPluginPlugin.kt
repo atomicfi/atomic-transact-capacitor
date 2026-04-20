@@ -50,6 +50,7 @@ class TransactPluginPlugin : Plugin() {
         }
 
         val environmentObj = call.getObject("environment")
+        val debug = call.getBoolean("debug") ?: false
         val activity = bridge.activity
         if (activity == null) {
             call.reject("Activity not available")
@@ -76,7 +77,8 @@ class TransactPluginPlugin : Plugin() {
         val config = Config(
             token = token,
             environment = "CUSTOM",
-            environmentURL = environmentURL
+            environmentURL = environmentURL,
+            webContentsDebuggingEnabled = debug
         )
 
         activity.runOnUiThread {
@@ -132,6 +134,7 @@ class TransactPluginPlugin : Plugin() {
         }
 
         val environmentObj = call.getObject("environment")
+        val debug = call.getBoolean("debug") ?: false
         val activity = bridge.activity
         if (activity == null) {
             call.reject("Activity not available")
@@ -145,7 +148,8 @@ class TransactPluginPlugin : Plugin() {
         val config = ActionConfig(
             id = id,
             environment = env,
-            environmentURL = envURL
+            environmentURL = envURL,
+            webContentsDebuggingEnabled = debug
         )
 
         activity.runOnUiThread {

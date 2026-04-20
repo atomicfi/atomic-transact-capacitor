@@ -26,6 +26,7 @@ interface State {
   customApiPath: string;
   selectedOperation: OperationType;
   darkMode: boolean;
+  debug: boolean;
   presentationStyle: 'formSheet' | 'fullScreen';
   useDeeplink: boolean;
   deeplinkStep: StepType;
@@ -41,6 +42,7 @@ export function createTransactScreen(): Screen {
     customApiPath: '',
     selectedOperation: Operation.DEPOSIT,
     darkMode: false,
+    debug: false,
     presentationStyle: PresentationStyle.FORM_SHEET,
     useDeeplink: false,
     deeplinkStep: Step.LOGIN_COMPANY,
@@ -137,6 +139,7 @@ export function createTransactScreen(): Screen {
         config,
         environment: getEnvironment(),
         presentationStyle: state.presentationStyle,
+        debug: state.debug,
       };
 
       await TransactPlugin.presentTransact(options);
@@ -255,6 +258,18 @@ export function createTransactScreen(): Screen {
                 </label>
               </div>
             </div>
+
+            <div class="switch-row">
+              <label class="label" style="margin-bottom: 0">Debug Mode</label>
+              <div class="switch-right">
+                <span class="switch-label">Off</span>
+                <label class="toggle">
+                  <input type="checkbox" id="debug-toggle" />
+                  <span class="toggle-track"></span>
+                </label>
+                <span class="switch-label">On</span>
+              </div>
+            </div>
           </div>
 
           <div class="section-card">
@@ -336,6 +351,11 @@ export function createTransactScreen(): Screen {
       document.getElementById('dark-mode-toggle')!.addEventListener('change', (e) => {
         state.darkMode = (e.target as HTMLInputElement).checked;
         document.getElementById('theme-label')!.textContent = state.darkMode ? 'Dark Mode' : 'Light Mode';
+      });
+
+      // Debug mode toggle
+      document.getElementById('debug-toggle')!.addEventListener('change', (e) => {
+        state.debug = (e.target as HTMLInputElement).checked;
       });
 
       // Operation pills

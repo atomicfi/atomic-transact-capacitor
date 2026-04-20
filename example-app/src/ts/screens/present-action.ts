@@ -18,6 +18,7 @@ interface State {
   customTransactPath: string;
   customApiPath: string;
   presentationStyle: string;
+  debug: boolean;
   isLoading: boolean;
 }
 
@@ -28,6 +29,7 @@ export function createPresentActionScreen(): Screen {
     customTransactPath: '',
     customApiPath: '',
     presentationStyle: PresentationStyle.FORM_SHEET,
+    debug: false,
     isLoading: false,
   };
 
@@ -89,6 +91,7 @@ export function createPresentActionScreen(): Screen {
         id: state.actionId.trim(),
         environment: getEnvironment(),
         presentationStyle: state.presentationStyle as 'formSheet' | 'fullScreen',
+        debug: state.debug,
       };
 
       await TransactPlugin.presentAction(options);
@@ -183,6 +186,18 @@ export function createPresentActionScreen(): Screen {
                 <input type="text" class="text-input text-input--mt" id="custom-api-path" placeholder="Enter custom API path" />
               </div>
             </div>
+
+            <div class="switch-row">
+              <label class="label" style="margin-bottom: 0">Debug Mode</label>
+              <div class="switch-right">
+                <span class="switch-label">Off</span>
+                <label class="toggle">
+                  <input type="checkbox" id="debug-toggle" />
+                  <span class="toggle-track"></span>
+                </label>
+                <span class="switch-label">On</span>
+              </div>
+            </div>
           </div>
 
           <div class="section-card">
@@ -222,6 +237,10 @@ export function createPresentActionScreen(): Screen {
 
       document.getElementById('custom-api-path')?.addEventListener('input', (e) => {
         state.customApiPath = (e.target as HTMLInputElement).value;
+      });
+
+      document.getElementById('debug-toggle')!.addEventListener('change', (e) => {
+        state.debug = (e.target as HTMLInputElement).checked;
       });
 
       document.querySelectorAll('#presentation-pills .pill').forEach((el) => {
