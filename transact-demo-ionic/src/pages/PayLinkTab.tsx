@@ -11,12 +11,13 @@ import {
   IonLabel,
   IonButton,
   IonFooter,
+  IonInput,
   IonList,
   IonListHeader,
   IonSelect,
   IonSelectOption,
 } from '@ionic/react';
-import { Step, type OperationType, type StepType } from '@atomicfi/transact-capacitor';
+import { App, Step, type AppType, type OperationType, type StepType } from '@atomicfi/transact-capacitor';
 import LaunchButton from '../components/LaunchButton';
 import ConfigPreviewModal from '../components/ConfigPreviewModal';
 import TokenWarningBanner from '../components/TokenWarningBanner';
@@ -34,13 +35,21 @@ const PayLinkTab: React.FC = () => {
   const [operation, setOperation] = useState<OperationType>('switch' as OperationType);
   const [deeplinkStep, setDeeplinkStep] = useState<StepType>(Step.SEARCH_COMPANY);
   const [deeplinkCompanyId, setDeeplinkCompanyId] = useState('');
+  const [deeplinkApp, setDeeplinkApp] = useState<AppType | null>(null);
+  const [deeplinkPayments, setDeeplinkPayments] = useState('');
+  const [deeplinkAccountId, setDeeplinkAccountId] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const isManage = operation === ('manage' as OperationType);
 
   const formState: PayLinkFormState = {
     operations: operation ? [operation] : [],
     deeplinkStep,
     deeplinkCompanyId,
+    deeplinkApp,
+    deeplinkPayments,
+    deeplinkAccountId,
   };
 
   const config = buildPayLinkConfig(formState, settings);
@@ -81,6 +90,7 @@ const PayLinkTab: React.FC = () => {
             <IonSegment value={operation} onIonChange={(e) => setOperation(e.detail.value as OperationType)}>
               <IonSegmentButton value="switch">Switch</IonSegmentButton>
               <IonSegmentButton value="present">Present</IonSegmentButton>
+              <IonSegmentButton value="manage">Manage</IonSegmentButton>
             </IonSegment>
           </IonItem>
         </IonList>
@@ -90,33 +100,78 @@ const PayLinkTab: React.FC = () => {
           <IonListHeader>
             <IonLabel>Deeplink</IonLabel>
           </IonListHeader>
-          <IonItem lines="none">
-            <IonSegment
-              value={deeplinkStep}
-              onIonChange={(e) => {
-                const val = e.detail.value as StepType;
-                setDeeplinkStep(val);
-              }}
-            >
-              <IonSegmentButton value="search-company">Search</IonSegmentButton>
-              <IonSegmentButton value="login-company">Login</IonSegmentButton>
-            </IonSegment>
-          </IonItem>
-          {deeplinkStep === 'login-company' && (
-            <IonItem lines="none">
-              <IonSelect
-                label="Company"
-                value={deeplinkCompanyId}
-                onIonChange={(e) => setDeeplinkCompanyId(e.detail.value ?? '')}
-                placeholder="Select a company"
-              >
-                {PAYLINK_COMPANIES.map((c) => (
-                  <IonSelectOption key={c.id} value={c.id}>
-                    {c.name}
-                  </IonSelectOption>
-                ))}
-              </IonSelect>
-            </IonItem>
+          {isManage ? (
+            <>
+              <IonItem lines="none">
+                <IonSelect
+                  label="App"
+                  value={deeplinkApp ?? ''}
+                  onIonChange={(e) => {
+                    const val = e.detail.value;
+                    setDeeplinkApp(val ? (val as AppType) : null);
+                  }}
+                >
+                  <IonSelectOption value="">None</IonSelectOption>
+                  <IonSelectOption value={App.PAY_NOW}>Pay Now</IonSelectOption>
+                  <IonSelectOption value={App.EXPENSES}>Expenses</IonSelectOption>
+                  <IonSelectOption value={App.ORDERS}>Orders</IonSelectOption>
+                  <IonSelectOption value={App.SUGGESTIONS}>Suggestions</IonSelectOption>
+                </IonSelect>
+              </IonItem>
+              {deeplinkApp && (
+                <>
+                  <IonItem lines="none">
+                    <IonInput
+                      label="Payments"
+                      labelPlacement="stacked"
+                      placeholder="Comma-separated payment IDs"
+                      value={deeplinkPayments}
+                      onIonInput={(e) => setDeeplinkPayments(e.detail.value ?? '')}
+                    />
+                  </IonItem>
+                  <IonItem lines="none">
+                    <IonInput
+                      label="Account ID"
+                      labelPlacement="stacked"
+                      placeholder="Account ID"
+                      value={deeplinkAccountId}
+                      onIonInput={(e) => setDeeplinkAccountId(e.detail.value ?? '')}
+                    />
+                  </IonItem>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <IonItem lines="none">
+                <IonSegment
+                  value={deeplinkStep}
+                  onIonChange={(e) => {
+                    const val = e.detail.value as StepType;
+                    setDeeplinkStep(val);
+                  }}
+                >
+                  <IonSegmentButton value="search-company">Search</IonSegmentButton>
+                  <IonSegmentButton value="login-company">Login</IonSegmentButton>
+                </IonSegment>
+              </IonItem>
+              {deeplinkStep === 'login-company' && (
+                <IonItem lines="none">
+                  <IonSelect
+                    label="Company"
+                    value={deeplinkCompanyId}
+                    onIonChange={(e) => setDeeplinkCompanyId(e.detail.value ?? '')}
+                    placeholder="Select a company"
+                  >
+                    {PAYLINK_COMPANIES.map((c) => (
+                      <IonSelectOption key={c.id} value={c.id}>
+                        {c.name}
+                      </IonSelectOption>
+                    ))}
+                  </IonSelect>
+                </IonItem>
+              )}
+            </>
           )}
         </IonList>
 

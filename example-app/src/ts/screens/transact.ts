@@ -8,6 +8,7 @@ import {
   Scope,
   Environment,
   Step,
+  App,
   PresentationStyle,
 } from '@atomicfi/transact-capacitor';
 import type {
@@ -17,6 +18,7 @@ import type {
   OperationType,
   ScopeType,
   StepType,
+  AppType,
 } from '@atomicfi/transact-capacitor';
 
 interface State {
@@ -31,6 +33,9 @@ interface State {
   useDeeplink: boolean;
   deeplinkStep: StepType;
   deeplinkCompanyId: string;
+  deeplinkApp: AppType;
+  deeplinkPayments: string;
+  deeplinkAccountId: string;
   isLoading: boolean;
 }
 
@@ -47,11 +52,19 @@ export function createTransactScreen(): Screen {
     useDeeplink: false,
     deeplinkStep: Step.LOGIN_COMPANY,
     deeplinkCompanyId: '',
+    deeplinkApp: App.PAY_NOW,
+    deeplinkPayments: '',
+    deeplinkAccountId: '',
     isLoading: false,
   };
 
   function getScope(): ScopeType {
-    return state.selectedOperation === Operation.SWITCH ? Scope.PAY_LINK : Scope.USER_LINK;
+    const payLinkOps: OperationType[] = [Operation.SWITCH, Operation.PRESENT, Operation.MANAGE];
+    return payLinkOps.includes(state.selectedOperation) ? Scope.PAY_LINK : Scope.USER_LINK;
+  }
+
+  function isManage(): boolean {
+    return state.selectedOperation === Operation.MANAGE;
   }
 
   function getEnvironment(): TransactEnvironment {
@@ -76,10 +89,12 @@ export function createTransactScreen(): Screen {
       return;
     }
 
-    const requiresCompanyId = state.deeplinkStep !== Step.SEARCH_COMPANY;
-    if (state.useDeeplink && requiresCompanyId && !state.deeplinkCompanyId.trim()) {
-      showAlert('Error', 'Please enter a Company ID when using deeplink');
-      return;
+    if (state.useDeeplink && !isManage()) {
+      const requiresCompanyId = state.deeplinkStep !== Step.SEARCH_COMPANY;
+      if (requiresCompanyId && !state.deeplinkCompanyId.trim()) {
+        showAlert('Error', 'Please enter a Company ID when using deeplink');
+        return;
+      }
     }
 
     state.isLoading = true;
@@ -129,10 +144,22 @@ export function createTransactScreen(): Screen {
       }
 
       if (state.useDeeplink) {
-        config.deeplink = {
-          step: state.deeplinkStep,
-          ...(state.deeplinkCompanyId.trim() && { companyId: state.deeplinkCompanyId.trim() }),
-        };
+        if (isManage()) {
+          const payments = state.deeplinkPayments
+            .split(',')
+            .map((p) => p.trim())
+            .filter((p) => p.length > 0);
+          config.deeplink = {
+            app: state.deeplinkApp,
+            ...(payments.length > 0 && { payments }),
+            ...(state.deeplinkAccountId.trim() && { accountId: state.deeplinkAccountId.trim() }),
+          };
+        } else {
+          config.deeplink = {
+            step: state.deeplinkStep,
+            ...(state.deeplinkCompanyId.trim() && { companyId: state.deeplinkCompanyId.trim() }),
+          };
+        }
       }
 
       const options: PresentTransactOptions = {
@@ -172,6 +199,22 @@ export function createTransactScreen(): Screen {
     document.querySelectorAll('#product-pills .pill').forEach((el) => {
       el.classList.toggle('selected', el.getAttribute('data-product') === product);
     });
+    updateDeeplinkVisibility();
+  }
+
+  function setDeeplinkApp(app: AppType) {
+    state.deeplinkApp = app;
+    document.querySelectorAll('#deeplink-app-pills .pill').forEach((el) => {
+      el.classList.toggle('selected', el.getAttribute('data-app') === app);
+    });
+  }
+
+  function updateDeeplinkVisibility() {
+    const manageSection = document.getElementById('deeplink-manage-options');
+    const defaultSection = document.getElementById('deeplink-default-options');
+    if (!manageSection || !defaultSection) return;
+    manageSection.classList.toggle('hidden', !isManage());
+    defaultSection.classList.toggle('hidden', isManage());
   }
 
   function setPresentationStyle(style: 'formSheet' | 'fullScreen') {
@@ -279,6 +322,7 @@ export function createTransactScreen(): Screen {
               <button class="pill" data-product="${Operation.VERIFY}">Verify</button>
               <button class="pill" data-product="${Operation.TAX}">Tax</button>
               <button class="pill" data-product="${Operation.SWITCH}">Switch</button>
+              <button class="pill" data-product="${Operation.MANAGE}">Manage</button>
             </div>
           </div>
 
@@ -300,17 +344,41 @@ export function createTransactScreen(): Screen {
             </div>
 
             <div id="deeplink-options" class="hidden">
-              <div class="input-group">
-                <label class="label">Step</label>
-                <div class="pill-group" id="deeplink-step-pills">
-                  <button class="pill selected" data-step="${Step.LOGIN_COMPANY}">Login Company</button>
-                  <button class="pill" data-step="${Step.SEARCH_COMPANY}">Search Company</button>
+              <div id="deeplink-default-options">
+                <div class="input-group">
+                  <label class="label">Step</label>
+                  <div class="pill-group" id="deeplink-step-pills">
+                    <button class="pill selected" data-step="${Step.LOGIN_COMPANY}">Login Company</button>
+                    <button class="pill" data-step="${Step.SEARCH_COMPANY}">Search Company</button>
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label class="label">Company ID</label>
+                  <input type="text" class="text-input" id="deeplink-company-id" placeholder="Enter company ID for deeplink" />
                 </div>
               </div>
 
-              <div class="input-group">
-                <label class="label">Company ID</label>
-                <input type="text" class="text-input" id="deeplink-company-id" placeholder="Enter company ID for deeplink" />
+              <div id="deeplink-manage-options" class="hidden">
+                <div class="input-group">
+                  <label class="label">App</label>
+                  <div class="pill-group" id="deeplink-app-pills">
+                    <button class="pill selected" data-app="${App.PAY_NOW}">Pay Now</button>
+                    <button class="pill" data-app="${App.EXPENSES}">Expenses</button>
+                    <button class="pill" data-app="${App.ORDERS}">Orders</button>
+                    <button class="pill" data-app="${App.SUGGESTIONS}">Suggestions</button>
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label class="label">Payments (comma-separated IDs)</label>
+                  <input type="text" class="text-input" id="deeplink-payments" placeholder="e.g. pay_1,pay_2" />
+                </div>
+
+                <div class="input-group">
+                  <label class="label">Account ID</label>
+                  <input type="text" class="text-input" id="deeplink-account-id" placeholder="Enter account ID" />
+                </div>
               </div>
             </div>
           </div>
@@ -338,6 +406,14 @@ export function createTransactScreen(): Screen {
 
       document.getElementById('deeplink-company-id')?.addEventListener('input', (e) => {
         state.deeplinkCompanyId = (e.target as HTMLInputElement).value;
+      });
+
+      document.getElementById('deeplink-payments')?.addEventListener('input', (e) => {
+        state.deeplinkPayments = (e.target as HTMLInputElement).value;
+      });
+
+      document.getElementById('deeplink-account-id')?.addEventListener('input', (e) => {
+        state.deeplinkAccountId = (e.target as HTMLInputElement).value;
       });
 
       // Environment radio
@@ -381,6 +457,13 @@ export function createTransactScreen(): Screen {
       document.querySelectorAll('#deeplink-step-pills .pill').forEach((el) => {
         el.addEventListener('click', () => {
           setDeeplinkStep(el.getAttribute('data-step')! as StepType);
+        });
+      });
+
+      // Deeplink app pills (manage)
+      document.querySelectorAll('#deeplink-app-pills .pill').forEach((el) => {
+        el.addEventListener('click', () => {
+          setDeeplinkApp(el.getAttribute('data-app')! as AppType);
         });
       });
 

@@ -9,7 +9,7 @@ import type { PluginListenerHandle } from '@capacitor/core';
  *
  * **UserLink** (`scope: 'user-link'`): `deposit`, `verify`, `tax`
  *
- * **PayLink** (`scope: 'pay-link'`): `switch`, `present`
+ * **PayLink** (`scope: 'pay-link'`): `switch`, `present`, `manage`
  */
 export const Operation = {
   /** UserLink — Direct Deposit Switching. */
@@ -22,6 +22,8 @@ export const Operation = {
   SWITCH: 'switch',
   /** PayLink — Bill Presentment. */
   PRESENT: 'present',
+  /** PayLink — Manage Paylink experience. */
+  MANAGE: 'manage',
 } as const;
 
 /** Product scope for a Transact session. */
@@ -51,6 +53,16 @@ export const Step = {
   LOGIN_COMPANY: 'login-company',
   /** Both scopes. Deeplinks to the company search screen. */
   SEARCH_COMPANY: 'search-company',
+} as const;
+
+/**
+ * PayLink-only. Apps available for the `manage` operation's deeplink.
+ */
+export const App = {
+  PAY_NOW: 'pay-now',
+  EXPENSES: 'expenses',
+  ORDERS: 'orders',
+  SUGGESTIONS: 'suggestions',
 } as const;
 
 /** Native presentation style for the Transact modal (iOS only). */
@@ -183,6 +195,7 @@ export type LanguageType = (typeof Language)[keyof typeof Language];
 export type HandoffType = (typeof Handoff)[keyof typeof Handoff];
 export type TagType = (typeof Tag)[keyof typeof Tag];
 export type StepType = (typeof Step)[keyof typeof Step];
+export type AppType = (typeof App)[keyof typeof App];
 export type TaskStatusType = (typeof TaskStatus)[keyof typeof TaskStatus];
 export type FailReasonType = (typeof FailReason)[keyof typeof FailReason];
 export type DeferredPaymentMethodStrategyType =
@@ -306,6 +319,12 @@ export interface TransactDeeplink {
   step?: StepType;
   /** Company ID to deeplink into. */
   companyId?: string;
+  /** PayLink `manage`-only. App to deeplink into — see {@link App}. */
+  app?: AppType;
+  /** PayLink `manage`-only. Payment IDs to target. */
+  payments?: string[];
+  /** PayLink `manage`-only. Account ID to target. */
+  accountId?: string;
 }
 
 /** UserLink-only. Search filtering by company tags. */
