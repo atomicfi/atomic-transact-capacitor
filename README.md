@@ -234,11 +234,12 @@ Result returned when a Transact flow finishes or is closed.
 
 Options for {@link TransactPluginPlugin.presentTransact}.
 
-| Prop                    | Type                                                                | Description                                        |
-| ----------------------- | ------------------------------------------------------------------- | -------------------------------------------------- |
-| **`config`**            | <code><a href="#transactconfig">TransactConfig</a></code>           | The Transact configuration.                        |
-| **`environment`**       | <code><a href="#transactenvironment">TransactEnvironment</a></code> | Environment to connect to. Defaults to production. |
-| **`presentationStyle`** | <code>'formSheet' \| 'fullScreen'</code>                            | iOS only. Modal presentation style.                |
+| Prop                    | Type                                                                | Description                                                                                                                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`config`**            | <code><a href="#transactconfig">TransactConfig</a></code>           | The Transact configuration.                                                                                                                                                                                   |
+| **`environment`**       | <code><a href="#transactenvironment">TransactEnvironment</a></code> | Environment to connect to. Defaults to production.                                                                                                                                                            |
+| **`presentationStyle`** | <code>'formSheet' \| 'fullScreen'</code>                            | iOS only. Modal presentation style.                                                                                                                                                                           |
+| **`debug`**             | <code>boolean</code>                                                | Enable debug mode. iOS: forwards debug logs to console.log and makes the WKWebView inspectable. Android: makes the WebView inspectable via chrome://inspect. Logs print automatically — no listener required. |
 
 
 #### TransactConfig
@@ -389,13 +390,14 @@ Environment configuration for connecting to Atomic services.
 
 Options for {@link TransactPluginPlugin.presentAction}.
 
-| Prop                    | Type                                                                | Description                                        |
-| ----------------------- | ------------------------------------------------------------------- | -------------------------------------------------- |
-| **`id`**                | <code>string</code>                                                 | Required. The action ID to present.                |
-| **`environment`**       | <code><a href="#transactenvironment">TransactEnvironment</a></code> | Environment to connect to. Defaults to production. |
-| **`theme`**             | <code><a href="#transacttheme">TransactTheme</a></code>             | Visual theme customization.                        |
-| **`metadata`**          | <code><a href="#record">Record</a>&lt;string, string&gt;</code>     | Custom key-value pairs returned in webhook events. |
-| **`presentationStyle`** | <code>'formSheet' \| 'fullScreen'</code>                            | iOS only. Modal presentation style.                |
+| Prop                    | Type                                                                | Description                                                                                                                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`id`**                | <code>string</code>                                                 | Required. The action ID to present.                                                                                                                                                                           |
+| **`environment`**       | <code><a href="#transactenvironment">TransactEnvironment</a></code> | Environment to connect to. Defaults to production.                                                                                                                                                            |
+| **`theme`**             | <code><a href="#transacttheme">TransactTheme</a></code>             | Visual theme customization.                                                                                                                                                                                   |
+| **`metadata`**          | <code><a href="#record">Record</a>&lt;string, string&gt;</code>     | Custom key-value pairs returned in webhook events.                                                                                                                                                            |
+| **`presentationStyle`** | <code>'formSheet' \| 'fullScreen'</code>                            | iOS only. Modal presentation style.                                                                                                                                                                           |
+| **`debug`**             | <code>boolean</code>                                                | Enable debug mode. iOS: forwards debug logs to console.log and makes the WKWebView inspectable. Android: makes the WebView inspectable via chrome://inspect. Logs print automatically — no listener required. |
 
 
 #### DataRequestResponse

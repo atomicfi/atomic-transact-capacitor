@@ -54,6 +54,7 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
 
         let environmentData = call.getObject("environment")
         let presentationStyle = call.getString("presentationStyle")
+        let debug = call.getBool("debug") ?? false
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self,
@@ -84,7 +85,14 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
                 let decoder = JSONDecoder()
                 let config = try decoder.decode(AtomicConfig.self, from: data)
 
-                Atomic.presentTransact(
+                Task { @MainActor in
+                    await Atomic.setDebug(isEnabled: debug, forwardLogs: { [weak self] message in
+                        DispatchQueue.main.async {
+                            self?.notifyListeners("onDebugLog", data: ["message": message])
+                        }
+                    })
+
+                    Atomic.presentTransact(
                     from: source,
                     config: config,
                     environment: parsedEnvironment,
@@ -155,6 +163,7 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
                         }
                     }
                 )
+                }
             } catch let DecodingError.keyNotFound(key, context) {
                 call.reject("Config error: Missing key '\(key.stringValue)' at path: \(context.codingPath.map(\.stringValue).joined(separator: ".")). Debug: \(context.debugDescription)")
             } catch let DecodingError.typeMismatch(type, context) {
@@ -177,6 +186,7 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
 
         let environmentData = call.getObject("environment")
         let presentationStyle = call.getString("presentationStyle")
+        let debug = call.getBool("debug") ?? false
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self,
@@ -203,7 +213,14 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
                 metadata = metadataData.compactMapValues { $0 as? String }
             }
 
-            Atomic.presentAction(
+            Task { @MainActor in
+                await Atomic.setDebug(isEnabled: debug, forwardLogs: { [weak self] message in
+                    DispatchQueue.main.async {
+                        self?.notifyListeners("onDebugLog", data: ["message": message])
+                    }
+                })
+
+                Atomic.presentAction(
                 from: source,
                 id: id,
                 environment: parsedEnvironment,
@@ -238,6 +255,7 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
                     }
                 }
             )
+            }
         }
     }
 

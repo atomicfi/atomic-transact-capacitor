@@ -372,6 +372,12 @@ export interface PresentTransactOptions {
   environment?: TransactEnvironment;
   /** iOS only. Modal presentation style. */
   presentationStyle?: 'formSheet' | 'fullScreen';
+  /**
+   * Enable debug mode. iOS: forwards debug logs to console.log and makes the
+   * WKWebView inspectable. Android: makes the WebView inspectable via
+   * chrome://inspect. Logs print automatically — no listener required.
+   */
+  debug?: boolean;
 }
 
 /** Options for {@link TransactPluginPlugin.presentAction}. */
@@ -386,6 +392,12 @@ export interface PresentActionOptions {
   metadata?: Record<string, string>;
   /** iOS only. Modal presentation style. */
   presentationStyle?: 'formSheet' | 'fullScreen';
+  /**
+   * Enable debug mode. iOS: forwards debug logs to console.log and makes the
+   * WKWebView inspectable. Android: makes the WebView inspectable via
+   * chrome://inspect. Logs print automatically — no listener required.
+   */
+  debug?: boolean;
 }
 
 /** Response payload for resolving an `onDataRequest` event. */
