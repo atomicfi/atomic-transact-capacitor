@@ -6,6 +6,7 @@ import type {
   OperationType,
   ScopeType,
   StepType,
+  AppType,
 } from '@atomicfi/transact-capacitor';
 
 import type { Settings } from '../providers/SettingsProvider';
@@ -16,6 +17,9 @@ export interface PayLinkFormState {
   operations: OperationType[];
   deeplinkStep: StepType | null;
   deeplinkCompanyId: string;
+  deeplinkApp: AppType | null;
+  deeplinkPayments: string;
+  deeplinkAccountId: string;
 }
 
 export function buildPayLinkConfig(form: PayLinkFormState, settings: Settings): TransactConfig {
@@ -26,7 +30,20 @@ export function buildPayLinkConfig(form: PayLinkFormState, settings: Settings): 
     scope: 'pay-link' as ScopeType,
     tasks,
   };
-  if (form.deeplinkStep) {
+
+  const isManage = form.operations.includes('manage' as OperationType);
+  if (isManage) {
+    if (form.deeplinkApp) {
+      const deeplink: TransactDeeplink = { app: form.deeplinkApp };
+      const payments = form.deeplinkPayments
+        .split(',')
+        .map((p) => p.trim())
+        .filter((p) => p.length > 0);
+      if (payments.length > 0) deeplink.payments = payments;
+      if (form.deeplinkAccountId) deeplink.accountId = form.deeplinkAccountId;
+      config.deeplink = deeplink;
+    }
+  } else if (form.deeplinkStep) {
     const deeplink: TransactDeeplink = { step: form.deeplinkStep };
     if (form.deeplinkCompanyId) deeplink.companyId = form.deeplinkCompanyId;
     config.deeplink = deeplink;

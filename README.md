@@ -334,6 +334,9 @@ Both `login-company` and `search-company` are supported by UserLink and PayLink.
 | --------------- | --------------------------------------------- | ------------------------------------------------------------------ |
 | **`step`**      | <code><a href="#steptype">StepType</a></code> | The step to navigate to — `'login-company'` or `'search-company'`. |
 | **`companyId`** | <code>string</code>                           | Company ID to deeplink into.                                       |
+| **`app`**       | <code><a href="#apptype">AppType</a></code>   | PayLink `manage`-only. App to deeplink into — see {@link App}.     |
+| **`payments`**  | <code>string[]</code>                         | PayLink `manage`-only. Payment IDs to target.                      |
+| **`accountId`** | <code>string</code>                           | PayLink `manage`-only. Account ID to target.                       |
 
 
 #### TransactSearch
@@ -575,6 +578,11 @@ Construct a type with a set of properties K of type T
 #### StepType
 
 <code>(typeof Step)[keyof typeof Step]</code>
+
+
+#### AppType
+
+<code>(typeof App)[keyof typeof App]</code>
 
 
 #### TagType
