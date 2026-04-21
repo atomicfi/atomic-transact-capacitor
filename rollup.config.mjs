@@ -7,6 +7,7 @@ export default {
       name: 'capacitorTransactPlugin',
       globals: {
         '@capacitor/core': 'capacitorExports',
+        '@atomicfi/transact-javascript': 'atomicTransactJavascript',
       },
       sourcemap: true,
       inlineDynamicImports: true,
@@ -18,5 +19,5 @@ export default {
       inlineDynamicImports: true,
     },
   ],
-  external: ['@capacitor/core'],
+  external: ['@capacitor/core', '@atomicfi/transact-javascript'],
 };
