@@ -419,6 +419,18 @@ export interface PresentActionOptions {
   debug?: boolean;
 }
 
+/** Options for {@link TransactPluginPlugin.pauseTransact}. */
+export interface PauseTransactOptions {
+  /** Whether the pause animation should play. Defaults to `true`. */
+  animated?: boolean;
+}
+
+/** Options for {@link TransactPluginPlugin.resumeTransact}. */
+export interface ResumeTransactOptions {
+  /** Whether the resume animation should play. Defaults to `true`. */
+  animated?: boolean;
+}
+
 /** Response payload for resolving an `onDataRequest` event. */
 export interface DataRequestResponse {
   /** Payment card data. */
@@ -566,6 +578,15 @@ export interface TransactPluginPlugin {
 
   /** Programmatically hide the Transact overlay. */
   hideTransact(): Promise<void>;
+
+  /**
+   * Pause the active Transact session, dismissing the UI while preserving
+   * session state so it can be resumed later with {@link resumeTransact}.
+   */
+  pauseTransact(options?: PauseTransactOptions): Promise<void>;
+
+  /** Resume a previously paused Transact session. */
+  resumeTransact(options?: ResumeTransactOptions): Promise<void>;
 
   /** Respond to an `onDataRequest` event with card or identity data. */
   resolveDataRequest(options: DataRequestResponse): Promise<void>;
