@@ -46,6 +46,7 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
+    "@atomicfi/transact-javascript": "^3.0.11",
     "@capacitor/android": "^8.0.0",
     "@capacitor/core": "^8.0.0",
     "@capacitor/docgen": "^0.3.1",
@@ -62,7 +63,13 @@
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "@capacitor/core": ">=8.0.0"
+    "@capacitor/core": ">=8.0.0",
+    "@atomicfi/transact-javascript": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@atomicfi/transact-javascript": {
+      "optional": true
+    }
   },
   "prettier": "@ionic/prettier-config",
   "swiftlint": "@ionic/swiftlint-config",
