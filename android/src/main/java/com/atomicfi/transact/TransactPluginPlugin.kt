@@ -9,14 +9,21 @@ import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
 import financial.atomic.transact.ActionConfig
 import financial.atomic.transact.Config
+import financial.atomic.transact.PausedTransactRef
 import financial.atomic.transact.Transact
 import financial.atomic.transact.receiver.TransactBroadcastReceiver
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 @CapacitorPlugin(name = "TransactPlugin")
 class TransactPluginPlugin : Plugin() {
 
     private var savedCall: PluginCall? = null
+    private var pausedRef: PausedTransactRef? = null
+    private val pluginScope = CoroutineScope(Dispatchers.Main + Job())
 
     private fun parseEnvironmentURL(environmentObj: JSONObject?): String {
         if (environmentObj == null) return "https://transact.atomicfi.com"
@@ -208,6 +215,46 @@ class TransactPluginPlugin : Plugin() {
                 call.resolve()
             } catch (e: Exception) {
                 call.reject("Failed to hide Transact", e)
+            }
+        }
+    }
+
+    @PluginMethod
+    fun pauseTransact(call: PluginCall) {
+        val animated = call.getBoolean("animated") ?: true
+
+        pluginScope.launch {
+            try {
+                val ref = Transact.pauseTransact(animated)
+                pausedRef = ref
+                call.resolve()
+            } catch (e: Exception) {
+                call.reject("Failed to pause Transact", e)
+            }
+        }
+    }
+
+    @PluginMethod
+    fun resumeTransact(call: PluginCall) {
+        val animated = call.getBoolean("animated") ?: true
+        val activity = bridge.activity
+        if (activity == null) {
+            call.reject("Activity not available")
+            return
+        }
+        val ref = pausedRef
+        if (ref == null) {
+            call.reject("No paused Transact session to resume")
+            return
+        }
+
+        activity.runOnUiThread {
+            try {
+                ref.resume(activity, animated)
+                pausedRef = null
+                call.resolve()
+            } catch (e: Exception) {
+                call.reject("Failed to resume Transact", e)
             }
         }
     }

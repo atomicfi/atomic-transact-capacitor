@@ -16,6 +16,8 @@ npx cap sync
 * [`presentTransact(...)`](#presenttransact)
 * [`presentAction(...)`](#presentaction)
 * [`hideTransact()`](#hidetransact)
+* [`pauseTransact(...)`](#pausetransact)
+* [`resumeTransact(...)`](#resumetransact)
 * [`resolveDataRequest(...)`](#resolvedatarequest)
 * [`addListener('onInteraction', ...)`](#addlisteneroninteraction-)
 * [`addListener('onDataRequest', ...)`](#addlistenerondatarequest-)
@@ -76,6 +78,37 @@ hideTransact() => Promise<void>
 ```
 
 Programmatically hide the Transact overlay.
+
+--------------------
+
+
+### pauseTransact(...)
+
+```typescript
+pauseTransact(options?: PauseTransactOptions | undefined) => Promise<void>
+```
+
+Pause the active Transact session, dismissing the UI while preserving
+session state so it can be resumed later with {@link resumeTransact}.
+
+| Param         | Type                                                                  |
+| ------------- | --------------------------------------------------------------------- |
+| **`options`** | <code><a href="#pausetransactoptions">PauseTransactOptions</a></code> |
+
+--------------------
+
+
+### resumeTransact(...)
+
+```typescript
+resumeTransact(options?: ResumeTransactOptions | undefined) => Promise<void>
+```
+
+Resume a previously paused Transact session.
+
+| Param         | Type                                                                    |
+| ------------- | ----------------------------------------------------------------------- |
+| **`options`** | <code><a href="#resumetransactoptions">ResumeTransactOptions</a></code> |
 
 --------------------
 
@@ -401,6 +434,24 @@ Options for {@link TransactPluginPlugin.presentAction}.
 | **`metadata`**          | <code><a href="#record">Record</a>&lt;string, string&gt;</code>     | Custom key-value pairs returned in webhook events.                                                                                                                                                            |
 | **`presentationStyle`** | <code>'formSheet' \| 'fullScreen'</code>                            | iOS only. Modal presentation style.                                                                                                                                                                           |
 | **`debug`**             | <code>boolean</code>                                                | Enable debug mode. iOS: forwards debug logs to console.log and makes the WKWebView inspectable. Android: makes the WebView inspectable via chrome://inspect. Logs print automatically — no listener required. |
+
+
+#### PauseTransactOptions
+
+Options for {@link TransactPluginPlugin.pauseTransact}.
+
+| Prop           | Type                 | Description                                                  |
+| -------------- | -------------------- | ------------------------------------------------------------ |
+| **`animated`** | <code>boolean</code> | Whether the pause animation should play. Defaults to `true`. |
+
+
+#### ResumeTransactOptions
+
+Options for {@link TransactPluginPlugin.resumeTransact}.
+
+| Prop           | Type                 | Description                                                   |
+| -------------- | -------------------- | ------------------------------------------------------------- |
+| **`animated`** | <code>boolean</code> | Whether the resume animation should play. Defaults to `true`. |
 
 
 #### DataRequestResponse

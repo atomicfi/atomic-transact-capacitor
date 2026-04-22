@@ -10,10 +10,13 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "presentTransact", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "presentAction", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "hideTransact", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "pauseTransact", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "resumeTransact", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resolveDataRequest", returnType: CAPPluginReturnPromise)
     ]
 
     private var dataResponseHandler: (([String: Any]?) -> Void)?
+    private var pausedTransactRef: Atomic.PausedTransactRef?
 
     // MARK: - Environment Parsing
 
@@ -264,6 +267,54 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func hideTransact(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             Atomic.hideTransact()
+            call.resolve()
+        }
+    }
+
+    // MARK: - pauseTransact
+
+    @objc func pauseTransact(_ call: CAPPluginCall) {
+        let animated = call.getBool("animated") ?? true
+
+        Task { @MainActor [weak self] in
+            guard let self = self else {
+                call.reject("Plugin deallocated")
+                return
+            }
+
+            do {
+                let ref = try await Atomic.pauseTransact(animated: animated)
+                self.pausedTransactRef = ref
+                call.resolve()
+            } catch Atomic.PauseTransactError.transactNotPresented {
+                call.reject("Transact is not currently presented")
+            } catch {
+                call.reject("Failed to pause Transact: \(String(describing: error))")
+            }
+        }
+    }
+
+    // MARK: - resumeTransact
+
+    @objc func resumeTransact(_ call: CAPPluginCall) {
+        let animated = call.getBool("animated") ?? true
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                call.reject("Plugin deallocated")
+                return
+            }
+            guard let ref = self.pausedTransactRef else {
+                call.reject("No paused Transact session to resume")
+                return
+            }
+            guard let source = self.bridge?.viewController else {
+                call.reject("Unable to get view controller")
+                return
+            }
+
+            ref.resume(source: source, animated: animated)
+            self.pausedTransactRef = nil
             call.resolve()
         }
     }

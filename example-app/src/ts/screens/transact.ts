@@ -36,6 +36,11 @@ interface State {
   deeplinkApp: AppType;
   deeplinkPayments: string;
   deeplinkAccountId: string;
+  autoHide: boolean;
+  autoHideSeconds: number;
+  autoPause: boolean;
+  autoPauseSeconds: number;
+  autoResumeSeconds: number;
   isLoading: boolean;
 }
 
@@ -55,8 +60,35 @@ export function createTransactScreen(): Screen {
     deeplinkApp: App.PAY_NOW,
     deeplinkPayments: '',
     deeplinkAccountId: '',
+    autoHide: false,
+    autoHideSeconds: 5,
+    autoPause: false,
+    autoPauseSeconds: 5,
+    autoResumeSeconds: 3,
     isLoading: false,
   };
+
+  let autoHideTimer: ReturnType<typeof setTimeout> | null = null;
+  let autoPauseTimer: ReturnType<typeof setTimeout> | null = null;
+  let autoResumeTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function clearAutoHideTimer() {
+    if (autoHideTimer !== null) {
+      clearTimeout(autoHideTimer);
+      autoHideTimer = null;
+    }
+  }
+
+  function clearPauseResumeTimers() {
+    if (autoPauseTimer !== null) {
+      clearTimeout(autoPauseTimer);
+      autoPauseTimer = null;
+    }
+    if (autoResumeTimer !== null) {
+      clearTimeout(autoResumeTimer);
+      autoResumeTimer = null;
+    }
+  }
 
   function getScope(): ScopeType {
     const payLinkOps: OperationType[] = [Operation.SWITCH, Operation.PRESENT, Operation.MANAGE];
@@ -120,6 +152,8 @@ export function createTransactScreen(): Screen {
       });
 
       await TransactPlugin.addListener('onFinish', (event) => {
+        clearAutoHideTimer();
+        clearPauseResumeTimers();
         state.isLoading = false;
         updateLaunchButton();
         console.log('Transact Finished:', event);
@@ -127,6 +161,8 @@ export function createTransactScreen(): Screen {
       });
 
       await TransactPlugin.addListener('onClose', (event) => {
+        clearAutoHideTimer();
+        clearPauseResumeTimers();
         state.isLoading = false;
         updateLaunchButton();
         console.log('Transact Closed:', event);
@@ -169,8 +205,54 @@ export function createTransactScreen(): Screen {
         debug: state.debug,
       };
 
+      if (state.autoHide) {
+        const delayMs = Math.max(0, state.autoHideSeconds) * 1000;
+        autoHideTimer = setTimeout(async () => {
+          console.log(`Auto-hide timer fired after ${state.autoHideSeconds}s — calling hideTransact()`);
+          try {
+            await TransactPlugin.hideTransact();
+            console.log('hideTransact() resolved');
+          } catch (err) {
+            console.error('hideTransact error:', err);
+            showAlert('Error', `hideTransact failed: ${err}`);
+          } finally {
+            // hideTransact does not fire onClose, so reset the loading state here.
+            state.isLoading = false;
+            updateLaunchButton();
+          }
+        }, delayMs);
+      }
+
+      if (state.autoPause) {
+        const pauseDelayMs = Math.max(0, state.autoPauseSeconds) * 1000;
+        const resumeDelayMs = Math.max(0, state.autoResumeSeconds) * 1000;
+        autoPauseTimer = setTimeout(async () => {
+          console.log(`Auto-pause timer fired after ${state.autoPauseSeconds}s — calling pauseTransact()`);
+          try {
+            await TransactPlugin.pauseTransact();
+            console.log('pauseTransact() resolved');
+
+            autoResumeTimer = setTimeout(async () => {
+              console.log(`Auto-resume timer fired after ${state.autoResumeSeconds}s — calling resumeTransact()`);
+              try {
+                await TransactPlugin.resumeTransact();
+                console.log('resumeTransact() resolved');
+              } catch (err) {
+                console.error('resumeTransact error:', err);
+                showAlert('Error', `resumeTransact failed: ${err}`);
+              }
+            }, resumeDelayMs);
+          } catch (err) {
+            console.error('pauseTransact error:', err);
+            showAlert('Error', `pauseTransact failed: ${err}`);
+          }
+        }, pauseDelayMs);
+      }
+
       await TransactPlugin.presentTransact(options);
     } catch (err) {
+      clearAutoHideTimer();
+      clearPauseResumeTimers();
       state.isLoading = false;
       updateLaunchButton();
       console.error('presentTransact error:', err);
@@ -383,6 +465,56 @@ export function createTransactScreen(): Screen {
             </div>
           </div>
 
+          <div class="section-card">
+            <div class="section-title">Hide Transact Test</div>
+
+            <div class="switch-row">
+              <label class="label" style="margin-bottom: 0">Auto-hide after launch</label>
+              <div class="switch-right">
+                <span class="switch-label">Off</span>
+                <label class="toggle">
+                  <input type="checkbox" id="auto-hide-toggle" />
+                  <span class="toggle-track"></span>
+                </label>
+                <span class="switch-label">On</span>
+              </div>
+            </div>
+
+            <div id="auto-hide-options" class="hidden">
+              <div class="input-group">
+                <label class="label">Seconds until hideTransact()</label>
+                <input type="number" class="text-input" id="auto-hide-seconds" min="0" step="1" value="5" />
+              </div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">Pause / Resume Test</div>
+
+            <div class="switch-row">
+              <label class="label" style="margin-bottom: 0">Auto-pause and resume after launch</label>
+              <div class="switch-right">
+                <span class="switch-label">Off</span>
+                <label class="toggle">
+                  <input type="checkbox" id="auto-pause-toggle" />
+                  <span class="toggle-track"></span>
+                </label>
+                <span class="switch-label">On</span>
+              </div>
+            </div>
+
+            <div id="auto-pause-options" class="hidden">
+              <div class="input-group">
+                <label class="label">Seconds until pauseTransact()</label>
+                <input type="number" class="text-input" id="auto-pause-seconds" min="0" step="1" value="5" />
+              </div>
+              <div class="input-group">
+                <label class="label">Seconds until resumeTransact()</label>
+                <input type="number" class="text-input" id="auto-resume-seconds" min="0" step="1" value="3" />
+              </div>
+            </div>
+          </div>
+
           <button class="launch-btn launch-btn--green" id="launch-transact-btn">Launch Transact</button>
         </div>
       `;
@@ -467,11 +599,43 @@ export function createTransactScreen(): Screen {
         });
       });
 
+      // Auto-hide toggle
+      document.getElementById('auto-hide-toggle')!.addEventListener('change', (e) => {
+        state.autoHide = (e.target as HTMLInputElement).checked;
+        document.getElementById('auto-hide-options')!.classList.toggle('hidden', !state.autoHide);
+      });
+
+      // Auto-hide seconds input
+      document.getElementById('auto-hide-seconds')!.addEventListener('input', (e) => {
+        const value = parseInt((e.target as HTMLInputElement).value, 10);
+        state.autoHideSeconds = Number.isFinite(value) ? value : 0;
+      });
+
+      // Auto-pause toggle
+      document.getElementById('auto-pause-toggle')!.addEventListener('change', (e) => {
+        state.autoPause = (e.target as HTMLInputElement).checked;
+        document.getElementById('auto-pause-options')!.classList.toggle('hidden', !state.autoPause);
+      });
+
+      // Auto-pause seconds
+      document.getElementById('auto-pause-seconds')!.addEventListener('input', (e) => {
+        const value = parseInt((e.target as HTMLInputElement).value, 10);
+        state.autoPauseSeconds = Number.isFinite(value) ? value : 0;
+      });
+
+      // Auto-resume seconds
+      document.getElementById('auto-resume-seconds')!.addEventListener('input', (e) => {
+        const value = parseInt((e.target as HTMLInputElement).value, 10);
+        state.autoResumeSeconds = Number.isFinite(value) ? value : 0;
+      });
+
       // Launch
       document.getElementById('launch-transact-btn')!.addEventListener('click', () => launch());
     },
 
     cleanup() {
+      clearAutoHideTimer();
+      clearPauseResumeTimers();
       TransactPlugin.removeAllListeners();
     },
   };

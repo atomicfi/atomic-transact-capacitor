@@ -108,6 +108,14 @@ export class TransactPluginWeb extends WebPlugin implements TransactPluginPlugin
     }
   }
 
+  async pauseTransact(): Promise<void> {
+    throw this.unavailable('pauseTransact is not supported on web.');
+  }
+
+  async resumeTransact(): Promise<void> {
+    throw this.unavailable('resumeTransact is not supported on web.');
+  }
+
   async resolveDataRequest(): Promise<void> {
     throw this.unavailable(
       'resolveDataRequest is not supported on web. Use deferredPaymentMethodStrategy: "api" to provide data via the Update User API.',

@@ -9,6 +9,8 @@ class TransactPluginTests: XCTestCase {
         XCTAssertTrue(methodNames.contains("presentTransact"))
         XCTAssertTrue(methodNames.contains("presentAction"))
         XCTAssertTrue(methodNames.contains("hideTransact"))
+        XCTAssertTrue(methodNames.contains("pauseTransact"))
+        XCTAssertTrue(methodNames.contains("resumeTransact"))
         XCTAssertTrue(methodNames.contains("resolveDataRequest"))
     }
 }
