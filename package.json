@@ -43,7 +43,26 @@
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "example-app/**/*.ts": [
+      "eslint --fix"
+    ],
+    "transact-demo-ionic/**/*.{ts,tsx}": [
+      "bash -c 'cd transact-demo-ionic && npx eslint --fix'"
+    ],
+    "*.{css,html,js,java}": [
+      "prettier --write"
+    ],
+    "ios/**/*.swift": [
+      "node-swiftlint --fix --format"
+    ]
   },
   "devDependencies": {
     "@atomicfi/transact-javascript": "^3.0.11",
@@ -55,6 +74,8 @@
     "@ionic/prettier-config": "^4.0.0",
     "@ionic/swiftlint-config": "^2.0.0",
     "eslint": "^8.57.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
     "prettier": "^3.6.2",
     "prettier-plugin-java": "^2.7.7",
     "rimraf": "^6.1.0",
@@ -63,8 +84,8 @@
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "@capacitor/core": ">=8.0.0",
-    "@atomicfi/transact-javascript": ">=3.0.0"
+    "@atomicfi/transact-javascript": ">=3.0.0",
+    "@capacitor/core": ">=8.0.0"
   },
   "peerDependenciesMeta": {
     "@atomicfi/transact-javascript": {
