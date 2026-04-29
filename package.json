@@ -1,10 +1,10 @@
 {
   "name": "@atomicfi/transact-capacitor",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Capactior plugin to use native sdks from Atomic",
   "main": "dist/plugin.cjs.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/esm/index.d.ts",
+  "module": "dist/esm/src/index.js",
+  "types": "dist/esm/src/index.d.ts",
   "unpkg": "dist/plugin.js",
   "files": [
     "android/src/main/",
@@ -73,6 +73,7 @@
     "@ionic/eslint-config": "^0.4.0",
     "@ionic/prettier-config": "^4.0.0",
     "@ionic/swiftlint-config": "^2.0.0",
+    "@rollup/plugin-json": "^6.1.0",
     "eslint": "^8.57.1",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",

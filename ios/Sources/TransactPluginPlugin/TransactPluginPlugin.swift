@@ -58,6 +58,7 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
         let environmentData = call.getObject("environment")
         let presentationStyle = call.getString("presentationStyle")
         let debug = call.getBool("debug") ?? false
+        let wrapperVersion = call.getString("wrapperVersion") ?? ""
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self,
@@ -77,8 +78,8 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
                     json["language"] = "en"
                 }
 
-                // Add platform info using SDK defaults with -capacitor suffix
-                json["platform"] = AtomicConfig.Platform(suffixed: "capacitor").encode()
+                // Add platform info using SDK defaults with -capacitor-<wrapper version> suffix
+                json["platform"] = AtomicConfig.Platform(suffixed: "capacitor-\(wrapperVersion)").encode()
 
                 guard let data = try? JSONSerialization.data(withJSONObject: json, options: []) else {
                     call.reject("Failed to serialize config")
@@ -96,76 +97,76 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
                     })
 
                     Atomic.presentTransact(
-                    from: source,
-                    config: config,
-                    environment: parsedEnvironment,
-                    presentationStyle: parsedPresentationStyle,
-                    onInteraction: { [weak self] interaction in
-                        self?.notifyListeners("onInteraction", data: [
-                            "name": interaction.name,
-                            "value": interaction.value
-                        ])
-                    },
-                    onDataRequest: { [weak self] request async -> TransactDataResponse? in
-                        return await withCheckedContinuation { continuation in
-                            self?.dataResponseHandler = { responseData in
-                                guard let responseDict = responseData else {
-                                    continuation.resume(returning: nil)
-                                    return
+                        from: source,
+                        config: config,
+                        environment: parsedEnvironment,
+                        presentationStyle: parsedPresentationStyle,
+                        onInteraction: { [weak self] interaction in
+                            self?.notifyListeners("onInteraction", data: [
+                                "name": interaction.name,
+                                "value": interaction.value
+                            ])
+                        },
+                        onDataRequest: { [weak self] request async -> TransactDataResponse? in
+                            return await withCheckedContinuation { continuation in
+                                self?.dataResponseHandler = { responseData in
+                                    guard let responseDict = responseData else {
+                                        continuation.resume(returning: nil)
+                                        return
+                                    }
+
+                                    do {
+                                        let jsonData = try JSONSerialization.data(withJSONObject: responseDict, options: [])
+                                        let response = try JSONDecoder().decode(TransactDataResponse.self, from: jsonData)
+                                        continuation.resume(returning: response)
+                                    } catch {
+                                        continuation.resume(returning: nil)
+                                    }
                                 }
 
-                                do {
-                                    let jsonData = try JSONSerialization.data(withJSONObject: responseDict, options: [])
-                                    let response = try JSONDecoder().decode(TransactDataResponse.self, from: jsonData)
-                                    continuation.resume(returning: response)
-                                } catch {
-                                    continuation.resume(returning: nil)
+                                // Build event data from the request
+                                var eventData: [String: Any] = [:]
+                                for (key, value) in request.data {
+                                    eventData[key] = value
                                 }
-                            }
+                                eventData["userId"] = request.userId
+                                eventData["identifier"] = request.identifier
+                                eventData["fields"] = request.fields
+                                if let taskId = request.taskId {
+                                    eventData["taskId"] = taskId
+                                }
 
-                            // Build event data from the request
-                            var eventData: [String: Any] = [:]
-                            for (key, value) in request.data {
-                                eventData[key] = value
+                                self?.notifyListeners("onDataRequest", data: eventData)
                             }
-                            eventData["userId"] = request.userId
-                            eventData["identifier"] = request.identifier
-                            eventData["fields"] = request.fields
-                            if let taskId = request.taskId {
-                                eventData["taskId"] = taskId
+                        },
+                        onAuthStatusUpdate: { [weak self] status in
+                            self?.notifyListeners("onAuthStatusUpdate", data: status.toDictionary())
+                        },
+                        onTaskStatusUpdate: { [weak self] status in
+                            self?.notifyListeners("onTaskStatusUpdate", data: status.toDictionary())
+                        },
+                        onLaunch: { [weak self] in
+                            self?.notifyListeners("onLaunch", data: [:])
+                        },
+                        onCompletion: { [weak self] result in
+                            switch result {
+                            case .finished(let response):
+                                let data = self?.sanitizeDictionary(response.data) ?? [:]
+                                self?.notifyListeners("onFinish", data: data)
+                                call.resolve(["finished": data])
+                            case .closed(let response):
+                                let data = self?.sanitizeDictionary(response.data) ?? [:]
+                                self?.notifyListeners("onClose", data: data)
+                                call.resolve(["closed": data])
+                            case .error:
+                                call.resolve(["error": "Unknown error"])
+                            case .transactDismissed:
+                                call.resolve(["closed": ["reason": "dismissed"]])
+                            @unknown default:
+                                call.resolve(["error": "Unknown error"])
                             }
-
-                            self?.notifyListeners("onDataRequest", data: eventData)
                         }
-                    },
-                    onAuthStatusUpdate: { [weak self] status in
-                        self?.notifyListeners("onAuthStatusUpdate", data: status.toDictionary())
-                    },
-                    onTaskStatusUpdate: { [weak self] status in
-                        self?.notifyListeners("onTaskStatusUpdate", data: status.toDictionary())
-                    },
-                    onLaunch: { [weak self] in
-                        self?.notifyListeners("onLaunch", data: [:])
-                    },
-                    onCompletion: { [weak self] result in
-                        switch result {
-                        case .finished(let response):
-                            let data = self?.sanitizeDictionary(response.data) ?? [:]
-                            self?.notifyListeners("onFinish", data: data)
-                            call.resolve(["finished": data])
-                        case .closed(let response):
-                            let data = self?.sanitizeDictionary(response.data) ?? [:]
-                            self?.notifyListeners("onClose", data: data)
-                            call.resolve(["closed": data])
-                        case .error:
-                            call.resolve(["error": "Unknown error"])
-                        case .transactDismissed:
-                            call.resolve(["closed": ["reason": "dismissed"]])
-                        @unknown default:
-                            call.resolve(["error": "Unknown error"])
-                        }
-                    }
-                )
+                    )
                 }
             } catch let DecodingError.keyNotFound(key, context) {
                 call.reject("Config error: Missing key '\(key.stringValue)' at path: \(context.codingPath.map(\.stringValue).joined(separator: ".")). Debug: \(context.debugDescription)")
@@ -211,7 +212,7 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
             }
 
             // Parse optional metadata
-            var metadata: [String: String]? = nil
+            var metadata: [String: String]?
             if let metadataData = call.getObject("metadata") {
                 metadata = metadataData.compactMapValues { $0 as? String }
             }
@@ -224,40 +225,40 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
                 })
 
                 Atomic.presentAction(
-                from: source,
-                id: id,
-                environment: parsedEnvironment,
-                presentationStyle: parsedPresentationStyle,
-                theme: theme,
-                metadata: metadata,
-                onLaunch: { [weak self] in
-                    self?.notifyListeners("onLaunch", data: [:])
-                },
-                onAuthStatusUpdate: { [weak self] status in
-                    self?.notifyListeners("onAuthStatusUpdate", data: status.toDictionary())
-                },
-                onTaskStatusUpdate: { [weak self] status in
-                    self?.notifyListeners("onTaskStatusUpdate", data: status.toDictionary())
-                },
-                onCompletion: { [weak self] result in
-                    switch result {
-                    case .finished(let response):
-                        let data = self?.sanitizeDictionary(response.data) ?? [:]
-                        self?.notifyListeners("onFinish", data: data)
-                        call.resolve(["finished": data])
-                    case .closed(let response):
-                        let data = self?.sanitizeDictionary(response.data) ?? [:]
-                        self?.notifyListeners("onClose", data: data)
-                        call.resolve(["closed": data])
-                    case .error:
-                        call.resolve(["error": "Unknown error"])
-                    case .transactDismissed:
-                        call.resolve(["closed": ["reason": "dismissed"]])
-                    @unknown default:
-                        call.resolve(["error": "Unknown error"])
+                    from: source,
+                    id: id,
+                    environment: parsedEnvironment,
+                    presentationStyle: parsedPresentationStyle,
+                    theme: theme,
+                    metadata: metadata,
+                    onLaunch: { [weak self] in
+                        self?.notifyListeners("onLaunch", data: [:])
+                    },
+                    onAuthStatusUpdate: { [weak self] status in
+                        self?.notifyListeners("onAuthStatusUpdate", data: status.toDictionary())
+                    },
+                    onTaskStatusUpdate: { [weak self] status in
+                        self?.notifyListeners("onTaskStatusUpdate", data: status.toDictionary())
+                    },
+                    onCompletion: { [weak self] result in
+                        switch result {
+                        case .finished(let response):
+                            let data = self?.sanitizeDictionary(response.data) ?? [:]
+                            self?.notifyListeners("onFinish", data: data)
+                            call.resolve(["finished": data])
+                        case .closed(let response):
+                            let data = self?.sanitizeDictionary(response.data) ?? [:]
+                            self?.notifyListeners("onClose", data: data)
+                            call.resolve(["closed": data])
+                        case .error:
+                            call.resolve(["error": "Unknown error"])
+                        case .transactDismissed:
+                            call.resolve(["closed": ["reason": "dismissed"]])
+                        @unknown default:
+                            call.resolve(["error": "Unknown error"])
+                        }
                     }
-                }
-            )
+                )
             }
         }
     }

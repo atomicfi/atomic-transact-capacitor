@@ -1,5 +1,8 @@
+import json from '@rollup/plugin-json';
+
 export default {
-  input: 'dist/esm/index.js',
+  input: 'dist/esm/src/index.js',
+  plugins: [json()],
   output: [
     {
       file: 'dist/plugin.js',
