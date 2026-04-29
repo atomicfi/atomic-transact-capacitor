@@ -1,6 +1,5 @@
 package com.atomicfi.transact
 
-import android.os.Build
 import android.util.Base64
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
@@ -58,6 +57,7 @@ class TransactPluginPlugin : Plugin() {
 
         val environmentObj = call.getObject("environment")
         val debug = call.getBoolean("debug") ?: false
+        val wrapperVersion = call.getString("wrapperVersion") ?: ""
         val activity = bridge.activity
         if (activity == null) {
             call.reject("Activity not available")
@@ -66,12 +66,9 @@ class TransactPluginPlugin : Plugin() {
 
         savedCall = call
 
-        // Add platform info to config
-        val platform = JSONObject()
-        platform.put("name", "android")
-        platform.put("systemVersion", Build.VERSION.SDK_INT.toString())
-        platform.put("sdkVersion", BuildConfig.TRANSACT_VERSION + "-capacitor")
-        configObj.put("platform", platform)
+        // Add platform info using SDK helper with `capacitor-<wrapper version>` suffix.
+        val platformMap = Config.Platform.suffixed("capacitor-$wrapperVersion").encode()
+        configObj.put("platform", JSONObject(platformMap as Map<String, Any?>))
 
         // Base64 encode the config for the token-based constructor
         val token = Base64.encodeToString(
@@ -142,6 +139,7 @@ class TransactPluginPlugin : Plugin() {
 
         val environmentObj = call.getObject("environment")
         val debug = call.getBoolean("debug") ?: false
+        val wrapperVersion = call.getString("wrapperVersion") ?: ""
         val activity = bridge.activity
         if (activity == null) {
             call.reject("Activity not available")
@@ -158,6 +156,7 @@ class TransactPluginPlugin : Plugin() {
             environmentURL = envURL,
             webContentsDebuggingEnabled = debug
         )
+        config.platform = Config.Platform.suffixed("capacitor-$wrapperVersion")
 
         activity.runOnUiThread {
             try {
