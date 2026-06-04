@@ -16,7 +16,7 @@
     "AtomicfiTransactCapacitor.podspec"
   ],
   "author": "atomicfi",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/atomicfi/atomic-transact-capacitor.git"
