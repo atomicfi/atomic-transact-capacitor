@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/atomicfi/atomic-transact-ios.git",
       "state" : {
-        "revision" : "80af94afd2f694ecddc32565d855a5b4713db90c",
-        "version" : "3.32.0"
+        "revision" : "42712d33c5f07d594a4c06aaf8e555678737544a",
+        "version" : "3.33.2"
       }
     },
     {
