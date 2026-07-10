@@ -34,11 +34,12 @@ export function useTransact(): UseTransactReturn {
         config,
         environment: buildEnvironment(),
         presentationStyle: settings.presentationStyle,
+        debug: settings.debug,
       };
 
       await TransactPlugin.presentTransact(options);
     },
-    [buildEnvironment, settings.presentationStyle],
+    [buildEnvironment, settings.presentationStyle, settings.debug],
   );
 
   return { launch };

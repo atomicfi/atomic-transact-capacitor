@@ -403,9 +403,10 @@ export interface PresentTransactOptions {
   /** iOS only. Modal presentation style. */
   presentationStyle?: 'formSheet' | 'fullScreen';
   /**
-   * Enable debug mode. iOS: forwards debug logs to console.log and makes the
-   * WKWebView inspectable. Android: makes the WebView inspectable via
-   * chrome://inspect. Logs print automatically — no listener required.
+   * Enable debug mode. Forwards native debug logs to `console.log` and makes the
+   * Transact webview inspectable (iOS: WKWebView via Safari Web Inspector;
+   * Android: WebView via chrome://inspect). Logs print automatically — no
+   * listener required.
    */
   debug?: boolean;
 }

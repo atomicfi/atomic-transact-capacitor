@@ -194,6 +194,29 @@ const SettingsTab: React.FC = () => {
           </IonItem>
         </IonList>
 
+        {/* Developer */}
+        <IonList inset>
+          <IonListHeader>
+            <IonLabel>Developer</IonLabel>
+          </IonListHeader>
+          <IonItem>
+            <IonToggle
+              checked={settings.debug}
+              onIonChange={(e) => updateSetting('debug', e.detail.checked)}
+            >
+              Debug Mode
+            </IonToggle>
+          </IonItem>
+          <IonItem lines="none">
+            <IonLabel className="ion-text-wrap">
+              <IonNote>
+                Forwards native debug logs to the console and makes the Transact webview
+                inspectable (iOS: Safari Web Inspector; Android: chrome://inspect).
+              </IonNote>
+            </IonLabel>
+          </IonItem>
+        </IonList>
+
         {/* About */}
         <IonList inset>
           <IonListHeader>
