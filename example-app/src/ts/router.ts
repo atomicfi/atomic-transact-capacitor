@@ -4,7 +4,7 @@ export interface Screen {
   cleanup(): void;
 }
 
-type Route = '/' | '/transact' | '/present-action';
+type Route = '/' | '/transact';
 
 let currentScreen: Screen | null = null;
 let routes: Record<Route, () => Screen>;

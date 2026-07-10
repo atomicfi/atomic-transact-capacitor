@@ -8,7 +8,6 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
     public let jsName = "TransactPlugin"
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "presentTransact", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "presentAction", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "hideTransact", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "pauseTransact", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resumeTransact", returnType: CAPPluginReturnPromise),
@@ -190,88 +189,6 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject("Config error: Value not found for \(type) at path: \(context.codingPath.map(\.stringValue).joined(separator: ".")). Debug: \(context.debugDescription)")
             } catch {
                 call.reject("Config error: \(String(describing: error))")
-            }
-        }
-    }
-
-    // MARK: - presentAction
-
-    @objc func presentAction(_ call: CAPPluginCall) {
-        guard let id = call.getString("id") else {
-            call.reject("id is required")
-            return
-        }
-
-        let presentationStyle = call.getString("presentationStyle")
-        let debug = call.getBool("debug") ?? false
-
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self,
-                  let source = self.bridge?.viewController else {
-                call.reject("Unable to get view controller")
-                return
-            }
-
-            let parsedEnvironment = self.parseEnvironment(from: call)
-            let parsedPresentationStyle = self.parsePresentationStyle(presentationStyle)
-
-            // Parse optional theme
-            var theme = AtomicConfig.Theme()
-            if let themeData = call.getObject("theme") {
-                if let jsonData = try? JSONSerialization.data(withJSONObject: themeData, options: []),
-                   let parsedTheme = try? JSONDecoder().decode(AtomicConfig.Theme.self, from: jsonData) {
-                    theme = parsedTheme
-                }
-            }
-
-            // Parse optional metadata
-            var metadata: [String: String]?
-            if let metadataData = call.getObject("metadata") {
-                metadata = metadataData.compactMapValues { $0 as? String }
-            }
-
-            Task { @MainActor in
-                await Atomic.setDebug(isEnabled: debug, forwardLogs: { [weak self] message in
-                    DispatchQueue.main.async {
-                        self?.notifyListeners("onDebugLog", data: ["message": message])
-                    }
-                })
-
-                Atomic.presentAction(
-                    from: source,
-                    id: id,
-                    environment: parsedEnvironment,
-                    presentationStyle: parsedPresentationStyle,
-                    theme: theme,
-                    metadata: metadata,
-                    onLaunch: { [weak self] in
-                        self?.notifyListeners("onLaunch", data: [:])
-                    },
-                    onAuthStatusUpdate: { [weak self] status in
-                        self?.notifyListeners("onAuthStatusUpdate", data: status.toDictionary())
-                    },
-                    onTaskStatusUpdate: { [weak self] status in
-                        self?.notifyListeners("onTaskStatusUpdate", data: status.toDictionary())
-                    },
-                    onCompletion: { [weak self] result in
-                        switch result {
-                        case .finished(let response):
-                            let data = self?.sanitizeDictionary(response.data) ?? [:]
-                            self?.notifyListeners("onFinish", data: data)
-                            call.resolve(["finished": data])
-                        case .closed(let response):
-                            let data = self?.sanitizeDictionary(response.data) ?? [:]
-                            self?.notifyListeners("onClose", data: data)
-                            call.resolve(["closed": data])
-                        case .error:
-                            call.resolve(["error": "Unknown error"])
-                        case .transactDismissed:
-                            call.resolve(["closed": ["reason": "dismissed"]])
-                        @unknown default:
-                            call.resolve(["error": "Unknown error"])
-                        }
-                    }
-                )
             }
         }
     }

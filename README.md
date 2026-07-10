@@ -14,7 +14,6 @@ npx cap sync
 <docgen-index>
 
 * [`presentTransact(...)`](#presenttransact)
-* [`presentAction(...)`](#presentaction)
 * [`hideTransact()`](#hidetransact)
 * [`pauseTransact(...)`](#pausetransact)
 * [`resumeTransact(...)`](#resumetransact)
@@ -48,23 +47,6 @@ Launch a Transact flow. Resolves when the flow finishes or is closed.
 | Param         | Type                                                                      |
 | ------------- | ------------------------------------------------------------------------- |
 | **`options`** | <code><a href="#presenttransactoptions">PresentTransactOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#transactresult">TransactResult</a>&gt;</code>
-
---------------------
-
-
-### presentAction(...)
-
-```typescript
-presentAction(options: PresentActionOptions) => Promise<TransactResult>
-```
-
-Present a specific action by ID. Resolves when the action completes or is closed.
-
-| Param         | Type                                                                  |
-| ------------- | --------------------------------------------------------------------- |
-| **`options`** | <code><a href="#presentactionoptions">PresentActionOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#transactresult">TransactResult</a>&gt;</code>
 
@@ -420,20 +402,6 @@ Environment configuration for connecting to Atomic services.
 | **`environment`**  | <code><a href="#environmenttype">EnvironmentType</a></code> | Environment target: `'production'`, `'sandbox'`, or `'custom'`. |
 | **`transactPath`** | <code>string</code>                                         | Custom Transact URL. Required when `environment` is `'custom'`. |
 | **`apiPath`**      | <code>string</code>                                         | Custom API URL. Required when `environment` is `'custom'`.      |
-
-
-#### PresentActionOptions
-
-Options for {@link TransactPluginPlugin.presentAction}.
-
-| Prop                    | Type                                                                            | Description                                                                                                                                                                                                           |
-| ----------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`id`**                | <code>string</code>                                                             | Required. The action ID to present.                                                                                                                                                                                   |
-| **`environment`**       | <code><a href="#transactenvironmentoption">TransactEnvironmentOption</a></code> | Environment to connect to. Pass `Environment.PRODUCTION` / `Environment.SANDBOX` (or the plain string), or a <a href="#transactenvironment">`TransactEnvironment`</a> object for custom URLs. Defaults to production. |
-| **`theme`**             | <code><a href="#transacttheme">TransactTheme</a></code>                         | Visual theme customization.                                                                                                                                                                                           |
-| **`metadata`**          | <code><a href="#record">Record</a>&lt;string, string&gt;</code>                 | Custom key-value pairs returned in webhook events.                                                                                                                                                                    |
-| **`presentationStyle`** | <code>'formSheet' \| 'fullScreen'</code>                                        | iOS only. Modal presentation style.                                                                                                                                                                                   |
-| **`debug`**             | <code>boolean</code>                                                            | Enable debug mode. iOS: forwards debug logs to console.log and makes the WKWebView inspectable. Android: makes the WebView inspectable via chrome://inspect. Logs print automatically — no listener required.         |
 
 
 #### PauseTransactOptions

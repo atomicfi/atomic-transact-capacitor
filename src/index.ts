@@ -2,11 +2,10 @@ import { registerPlugin } from '@capacitor/core';
 
 import { version as wrapperVersion } from '../package.json';
 
-import type { PresentActionOptions, PresentTransactOptions, TransactPluginPlugin, TransactResult } from './definitions';
+import type { PresentTransactOptions, TransactPluginPlugin, TransactResult } from './definitions';
 
-type TransactPluginBridge = Omit<TransactPluginPlugin, 'presentTransact' | 'presentAction'> & {
+type TransactPluginBridge = Omit<TransactPluginPlugin, 'presentTransact'> & {
   presentTransact(options: PresentTransactOptions & { wrapperVersion: string }): Promise<TransactResult>;
-  presentAction(options: PresentActionOptions & { wrapperVersion: string }): Promise<TransactResult>;
 };
 
 const rawPlugin = registerPlugin<TransactPluginBridge>('TransactPlugin', {
@@ -41,10 +40,6 @@ const TransactPlugin: TransactPluginPlugin = new Proxy(rawPlugin, {
     if (prop === 'presentTransact') {
       return (options: PresentTransactOptions): Promise<TransactResult> =>
         withDebugLogging(options?.debug, () => target.presentTransact({ ...options, wrapperVersion }));
-    }
-    if (prop === 'presentAction') {
-      return (options: PresentActionOptions): Promise<TransactResult> =>
-        withDebugLogging(options?.debug, () => target.presentAction({ ...options, wrapperVersion }));
     }
     return Reflect.get(target, prop, receiver);
   },

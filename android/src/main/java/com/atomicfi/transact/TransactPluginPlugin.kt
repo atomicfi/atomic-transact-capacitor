@@ -6,7 +6,6 @@ import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
-import financial.atomic.transact.ActionConfig
 import financial.atomic.transact.Config
 import financial.atomic.transact.PausedTransactRef
 import financial.atomic.transact.Transact
@@ -47,14 +46,6 @@ class TransactPluginPlugin : Plugin() {
             "sandbox" -> "https://transact-sandbox.atomicfi.com"
             "custom" -> transactPath ?: "https://transact.atomicfi.com"
             else -> "https://transact.atomicfi.com"
-        }
-    }
-
-    private fun parseActionEnvironment(name: String, transactPath: String?): Pair<Config.Environment, String?> {
-        return when (name) {
-            "sandbox" -> Pair(Config.Environment.SANDBOX, null)
-            "custom" -> Pair(Config.Environment.CUSTOM, transactPath ?: "https://transact.atomicfi.com")
-            else -> Pair(Config.Environment.PRODUCTION, null)
         }
     }
 
@@ -135,77 +126,6 @@ class TransactPluginPlugin : Plugin() {
                 })
             } catch (e: Exception) {
                 call.reject("Failed to present Transact", e)
-                savedCall = null
-            }
-        }
-    }
-
-    @PluginMethod
-    fun presentAction(call: PluginCall) {
-        val id = call.getString("id")
-        if (id == null) {
-            call.reject("id is required")
-            return
-        }
-
-        val (environmentName, transactPath) = readEnvironment(call)
-        val debug = call.getBoolean("debug") ?: false
-        val wrapperVersion = call.getString("wrapperVersion") ?: ""
-        val activity = bridge.activity
-        if (activity == null) {
-            call.reject("Activity not available")
-            return
-        }
-
-        savedCall = call
-
-        val (env, envURL) = parseActionEnvironment(environmentName, transactPath)
-
-        val config = ActionConfig(
-            id = id,
-            environment = env,
-            environmentURL = envURL,
-            webContentsDebuggingEnabled = debug
-        )
-        config.platform = Config.Platform.suffixed("capacitor-$wrapperVersion")
-
-        activity.runOnUiThread {
-            try {
-                Transact.presentAction(activity, config)
-
-                Transact.registerReceiver(activity, object : TransactBroadcastReceiver() {
-                    override fun onLaunch() {
-                        notifyListeners("onLaunch", JSObject())
-                    }
-
-                    override fun onClose(data: JSONObject) {
-                        notifyListeners("onClose", jsonToJSObject(data))
-
-                        val result = JSObject()
-                        result.put("closed", jsonToJSObject(data))
-                        savedCall?.resolve(result)
-                        savedCall = null
-                    }
-
-                    override fun onFinish(data: JSONObject) {
-                        notifyListeners("onFinish", jsonToJSObject(data))
-
-                        val result = JSObject()
-                        result.put("finished", jsonToJSObject(data))
-                        savedCall?.resolve(result)
-                        savedCall = null
-                    }
-
-                    override fun onAuthStatusUpdate(data: JSONObject) {
-                        notifyListeners("onAuthStatusUpdate", jsonToJSObject(data))
-                    }
-
-                    override fun onTaskStatusUpdate(data: JSONObject) {
-                        notifyListeners("onTaskStatusUpdate", jsonToJSObject(data))
-                    }
-                })
-            } catch (e: Exception) {
-                call.reject("Failed to present action", e)
                 savedCall = null
             }
         }
