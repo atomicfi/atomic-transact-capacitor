@@ -84,7 +84,7 @@ class TransactPluginPlugin : Plugin() {
             token = token,
             environment = "CUSTOM",
             environmentURL = environmentURL,
-            webContentsDebuggingEnabled = debug
+            debug = debug
         )
 
         activity.runOnUiThread {
@@ -106,6 +106,10 @@ class TransactPluginPlugin : Plugin() {
                         result.put("finished", jsonToJSObject(data))
                         savedCall?.resolve(result)
                         savedCall = null
+                    }
+
+                    override fun onDebugLog(level: String, tag: String, message: String, data: JSONObject) {
+                        notifyListeners("onDebugLog", jsonToJSObject(data))
                     }
 
                     override fun onInteraction(data: JSONObject) {

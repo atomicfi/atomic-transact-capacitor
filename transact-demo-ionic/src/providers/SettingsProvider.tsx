@@ -15,6 +15,7 @@ export interface Settings {
   showBackButton: boolean;
   showBackButtonText: boolean;
   showCloseButton: boolean;
+  debug: boolean;
 }
 
 const defaultSettings: Settings = {
@@ -30,6 +31,7 @@ const defaultSettings: Settings = {
   showBackButton: true,
   showBackButtonText: false,
   showCloseButton: true,
+  debug: false,
 };
 
 export interface SettingsContextValue {
