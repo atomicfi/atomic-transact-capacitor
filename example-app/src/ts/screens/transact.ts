@@ -14,7 +14,7 @@ import {
 import type {
   TransactConfig,
   PresentTransactOptions,
-  TransactEnvironment,
+  TransactEnvironmentOption,
   OperationType,
   ScopeType,
   StepType,
@@ -99,14 +99,18 @@ export function createTransactScreen(): Screen {
     return state.selectedOperation === Operation.MANAGE;
   }
 
-  function getEnvironment(): TransactEnvironment {
+  function getEnvironment(): TransactEnvironmentOption {
     switch (state.environment) {
       case 'production':
-        return Environment.production;
+        return Environment.PRODUCTION;
       case 'custom':
-        return Environment.custom(state.customTransactPath.trim(), state.customApiPath.trim());
+        return {
+          environment: Environment.CUSTOM,
+          transactPath: state.customTransactPath.trim(),
+          apiPath: state.customApiPath.trim(),
+        };
       default:
-        return Environment.sandbox;
+        return Environment.SANDBOX;
     }
   }
 
