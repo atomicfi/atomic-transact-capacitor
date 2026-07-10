@@ -55,7 +55,7 @@
       "eslint --fix"
     ],
     "transact-demo-ionic/**/*.{ts,tsx}": [
-      "bash -c 'cd transact-demo-ionic && npx eslint --fix'"
+      "bash -c 'cd transact-demo-ionic && npx eslint --fix \"$@\"' --"
     ],
     "*.{css,html,js,java}": [
       "prettier --write"

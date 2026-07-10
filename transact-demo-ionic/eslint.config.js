@@ -5,7 +5,8 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'cypress.config.ts'] },
+  // Generated Capacitor platform projects and build output — not source, never lint.
+  { ignores: ['dist', 'cypress.config.ts', 'ios', 'android'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
