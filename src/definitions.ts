@@ -410,30 +410,6 @@ export interface PresentTransactOptions {
   debug?: boolean;
 }
 
-/** Options for {@link TransactPluginPlugin.presentAction}. */
-export interface PresentActionOptions {
-  /** Required. The action ID to present. */
-  id: string;
-  /**
-   * Environment to connect to. Pass `Environment.PRODUCTION` / `Environment.SANDBOX`
-   * (or the plain string), or a `TransactEnvironment` object for custom URLs.
-   * Defaults to production.
-   */
-  environment?: TransactEnvironmentOption;
-  /** Visual theme customization. */
-  theme?: TransactTheme;
-  /** Custom key-value pairs returned in webhook events. */
-  metadata?: Record<string, string>;
-  /** iOS only. Modal presentation style. */
-  presentationStyle?: 'formSheet' | 'fullScreen';
-  /**
-   * Enable debug mode. iOS: forwards debug logs to console.log and makes the
-   * WKWebView inspectable. Android: makes the WebView inspectable via
-   * chrome://inspect. Logs print automatically — no listener required.
-   */
-  debug?: boolean;
-}
-
 /** Options for {@link TransactPluginPlugin.pauseTransact}. */
 export interface PauseTransactOptions {
   /** Whether the pause animation should play. Defaults to `true`. */
@@ -587,9 +563,6 @@ export interface CloseEvent {
 export interface TransactPluginPlugin {
   /** Launch a Transact flow. Resolves when the flow finishes or is closed. */
   presentTransact(options: PresentTransactOptions): Promise<TransactResult>;
-
-  /** Present a specific action by ID. Resolves when the action completes or is closed. */
-  presentAction(options: PresentActionOptions): Promise<TransactResult>;
 
   /** Programmatically hide the Transact overlay. */
   hideTransact(): Promise<void>;

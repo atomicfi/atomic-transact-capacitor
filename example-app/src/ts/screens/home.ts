@@ -17,11 +17,6 @@ export function createHomeScreen(): Screen {
             <div class="nav-card-subtitle">Test the complete financial connection experience</div>
           </button>
 
-          <button class="nav-card nav-card--blue" id="btn-action">
-            <div class="nav-card-title">Present Action</div>
-            <div class="nav-card-subtitle">Launch specific actions by ID</div>
-          </button>
-
           <button class="nav-card nav-card--gray" id="btn-about">
             <div class="nav-card-title">About This Example</div>
             <div class="nav-card-subtitle">Learn more about the SDK features</div>
@@ -39,14 +34,10 @@ export function createHomeScreen(): Screen {
         navigate('/transact');
       });
 
-      document.getElementById('btn-action')!.addEventListener('click', () => {
-        navigate('/present-action');
-      });
-
       document.getElementById('btn-about')!.addEventListener('click', () => {
         showAlert(
           'Atomic Transact SDK',
-          'This example app demonstrates the integration of the @atomicfi/transact-capacitor package.\n\nFeatures:\n\u2022 Transact Flow - Complete financial connection flow\n\u2022 Present Action - Launch specific actions\n\u2022 Environment switching (Sandbox/Production)\n\u2022 Custom theming and configuration\n\nNote: You need valid Atomic credentials to test the actual flows.'
+          'This example app demonstrates the integration of the @atomicfi/transact-capacitor package.\n\nFeatures:\n\u2022 Transact Flow - Complete financial connection flow\n\u2022 Environment switching (Sandbox/Production)\n\u2022 Custom theming and configuration\n\nNote: You need valid Atomic credentials to test the actual flows.'
         );
       });
     },

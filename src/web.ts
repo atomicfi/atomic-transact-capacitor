@@ -105,10 +105,6 @@ export class TransactPluginWeb extends WebPlugin implements TransactPluginPlugin
     });
   }
 
-  async presentAction(): Promise<TransactResult> {
-    throw this.unavailable('presentAction is not supported by the Atomic JavaScript SDK on web.');
-  }
-
   async hideTransact(): Promise<void> {
     this.activeHandle?.close();
     this.activeHandle = null;
