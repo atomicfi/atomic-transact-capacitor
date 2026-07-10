@@ -51,10 +51,10 @@ npm run build && npm run preview
 npm run ios
 ```
 
-This rebuilds the plugin, builds the web assets, runs `npx cap sync ios`, and launches
-the app on the iOS Simulator. The default target is **iPhone 16 Pro** — to use a
-different simulator, either edit the `--target-name` in the `ios` script or open the
-project in Xcode:
+Rebuilds the plugin, builds the web assets, runs `npx cap sync ios`, and launches the app
+on your **currently booted simulator**. If no simulator is booted, Capacitor prompts you
+to pick a target (the list includes connected devices). Boot a simulator first with, e.g.,
+`open -a Simulator`, or open the project in Xcode:
 
 ```bash
 npm run build:ios      # build + sync only
@@ -68,8 +68,8 @@ npm run android
 ```
 
 Rebuilds the plugin, builds the web assets, runs `npx cap sync android`, and launches the
-app on the emulator. The default target is **Pixel 9 Pro** — to use a different device,
-edit the `--target-name` in the `android` script or open the project in Android Studio:
+app on the **first connected device or running emulator** (detected via `adb`). If none is
+running, Capacitor prompts you to pick a target:
 
 ```bash
 npm run build:android  # build + sync only
