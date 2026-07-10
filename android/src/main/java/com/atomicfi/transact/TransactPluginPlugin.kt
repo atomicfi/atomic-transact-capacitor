@@ -24,25 +24,36 @@ class TransactPluginPlugin : Plugin() {
     private var pausedRef: PausedTransactRef? = null
     private val pluginScope = CoroutineScope(Dispatchers.Main + Job())
 
-    private fun parseEnvironmentURL(environmentObj: JSONObject?): String {
-        if (environmentObj == null) return "https://transact.atomicfi.com"
+    // The `environment` option accepts a shorthand string ("production" | "sandbox") or a
+    // full object ({ environment, transactPath?, apiPath? }). Normalize both to a name and
+    // optional transactPath.
+    private fun readEnvironment(call: PluginCall): Pair<String, String?> {
+        // Shorthand string form.
+        call.getString("environment")?.let { return Pair(it, null) }
 
-        return when (environmentObj.optString("environment", "production")) {
+        // Object form.
+        val environmentObj = call.getObject("environment") ?: return Pair("production", null)
+        val name = environmentObj.optString("environment", "production")
+        val transactPath = if (environmentObj.has("transactPath")) {
+            environmentObj.optString("transactPath")
+        } else {
+            null
+        }
+        return Pair(name, transactPath)
+    }
+
+    private fun parseEnvironmentURL(name: String, transactPath: String?): String {
+        return when (name) {
             "sandbox" -> "https://transact-sandbox.atomicfi.com"
-            "custom" -> environmentObj.optString("transactPath", "https://transact.atomicfi.com")
+            "custom" -> transactPath ?: "https://transact.atomicfi.com"
             else -> "https://transact.atomicfi.com"
         }
     }
 
-    private fun parseActionEnvironment(environmentObj: JSONObject?): Pair<Config.Environment, String?> {
-        if (environmentObj == null) return Pair(Config.Environment.PRODUCTION, null)
-
-        return when (environmentObj.optString("environment", "production")) {
+    private fun parseActionEnvironment(name: String, transactPath: String?): Pair<Config.Environment, String?> {
+        return when (name) {
             "sandbox" -> Pair(Config.Environment.SANDBOX, null)
-            "custom" -> {
-                val transactPath = environmentObj.optString("transactPath", "https://transact.atomicfi.com")
-                Pair(Config.Environment.CUSTOM, transactPath)
-            }
+            "custom" -> Pair(Config.Environment.CUSTOM, transactPath ?: "https://transact.atomicfi.com")
             else -> Pair(Config.Environment.PRODUCTION, null)
         }
     }
@@ -55,7 +66,7 @@ class TransactPluginPlugin : Plugin() {
             return
         }
 
-        val environmentObj = call.getObject("environment")
+        val (environmentName, transactPath) = readEnvironment(call)
         val debug = call.getBoolean("debug") ?: false
         val wrapperVersion = call.getString("wrapperVersion") ?: ""
         val activity = bridge.activity
@@ -76,7 +87,7 @@ class TransactPluginPlugin : Plugin() {
             Base64.NO_WRAP
         )
 
-        val environmentURL = parseEnvironmentURL(environmentObj)
+        val environmentURL = parseEnvironmentURL(environmentName, transactPath)
 
         val config = Config(
             token = token,
@@ -137,7 +148,7 @@ class TransactPluginPlugin : Plugin() {
             return
         }
 
-        val environmentObj = call.getObject("environment")
+        val (environmentName, transactPath) = readEnvironment(call)
         val debug = call.getBoolean("debug") ?: false
         val wrapperVersion = call.getString("wrapperVersion") ?: ""
         val activity = bridge.activity
@@ -148,7 +159,7 @@ class TransactPluginPlugin : Plugin() {
 
         savedCall = call
 
-        val (env, envURL) = parseActionEnvironment(environmentObj)
+        val (env, envURL) = parseActionEnvironment(environmentName, transactPath)
 
         val config = ActionConfig(
             id = id,

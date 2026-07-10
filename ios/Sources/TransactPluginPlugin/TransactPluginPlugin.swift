@@ -20,19 +20,34 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
 
     // MARK: - Environment Parsing
 
-    private func parseEnvironment(_ environmentData: [String: Any]?) -> TransactEnvironment {
-        guard let env = environmentData,
-              let environment = env["environment"] as? String else {
-            return .production
+    private func parseEnvironment(from call: CAPPluginCall) -> TransactEnvironment {
+        // Shorthand string form: "production" | "sandbox".
+        if let name = call.getString("environment") {
+            return environment(named: name, transactPath: nil, apiPath: nil)
         }
 
-        switch environment {
+        // Object form: { environment, transactPath?, apiPath? }.
+        if let env = call.getObject("environment"),
+           let name = env["environment"] as? String {
+            return environment(
+                named: name,
+                transactPath: env["transactPath"] as? String,
+                apiPath: env["apiPath"] as? String
+            )
+        }
+
+        return .production
+    }
+
+    private func environment(named name: String, transactPath: String?, apiPath: String?) -> TransactEnvironment {
+        switch name {
         case "sandbox":
             return .sandbox
         case "custom":
-            let transactPath = env["transactPath"] as? String ?? "https://transact.atomicfi.com"
-            let apiPath = env["apiPath"] as? String ?? "https://api.atomicfi.com"
-            return .custom(transactPath: transactPath, apiPath: apiPath)
+            return .custom(
+                transactPath: transactPath ?? "https://transact.atomicfi.com",
+                apiPath: apiPath ?? "https://api.atomicfi.com"
+            )
         default:
             return .production
         }
@@ -55,7 +70,6 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
 
-        let environmentData = call.getObject("environment")
         let presentationStyle = call.getString("presentationStyle")
         let debug = call.getBool("debug") ?? false
         let wrapperVersion = call.getString("wrapperVersion") ?? ""
@@ -67,7 +81,7 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
                 return
             }
 
-            let parsedEnvironment = self.parseEnvironment(environmentData)
+            let parsedEnvironment = self.parseEnvironment(from: call)
             let parsedPresentationStyle = self.parsePresentationStyle(presentationStyle)
 
             do {
@@ -188,7 +202,6 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
 
-        let environmentData = call.getObject("environment")
         let presentationStyle = call.getString("presentationStyle")
         let debug = call.getBool("debug") ?? false
 
@@ -199,7 +212,7 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
                 return
             }
 
-            let parsedEnvironment = self.parseEnvironment(environmentData)
+            let parsedEnvironment = self.parseEnvironment(from: call)
             let parsedPresentationStyle = self.parsePresentationStyle(presentationStyle)
 
             // Parse optional theme

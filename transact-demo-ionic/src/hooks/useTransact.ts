@@ -1,5 +1,5 @@
-import { TransactPlugin } from '@atomicfi/transact-capacitor';
-import type { TransactConfig, TransactEnvironment, PresentTransactOptions } from '@atomicfi/transact-capacitor';
+import { TransactPlugin, Environment } from '@atomicfi/transact-capacitor';
+import type { TransactConfig, PresentTransactOptions } from '@atomicfi/transact-capacitor';
 import { useCallback } from 'react';
 
 import { useSettings } from './useSettings';
@@ -11,15 +11,15 @@ interface UseTransactReturn {
 export function useTransact(): UseTransactReturn {
   const { settings } = useSettings();
 
-  const buildEnvironment = useCallback((): TransactEnvironment | undefined => {
+  const buildEnvironment = useCallback((): PresentTransactOptions['environment'] => {
     switch (settings.environment) {
       case 'production':
-        return { environment: 'production' };
+        return Environment.PRODUCTION;
       case 'sandbox':
-        return { environment: 'sandbox' };
+        return Environment.SANDBOX;
       case 'custom':
         return {
-          environment: 'custom',
+          environment: Environment.CUSTOM,
           transactPath: settings.customTransactPath,
           apiPath: settings.customApiPath,
         };

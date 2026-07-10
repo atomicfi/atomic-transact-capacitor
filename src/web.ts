@@ -4,6 +4,7 @@ import type {
   DataRequestEvent,
   InteractionEvent,
   PresentTransactOptions,
+  TransactEnvironment,
   TransactPluginPlugin,
   TransactResult,
 } from './definitions';
@@ -25,6 +26,13 @@ interface AtomicTransactSdk {
 
 const DEFAULT_TRANSACT_ORIGIN = 'https://transact.atomicfi.com';
 
+// The `environment` option accepts a shorthand string ('production' | 'sandbox') or a
+// full TransactEnvironment object. Normalize both to the object form before reading it.
+function resolveEnvironment(environment: PresentTransactOptions['environment']): TransactEnvironment | undefined {
+  if (!environment) return undefined;
+  return typeof environment === 'string' ? { environment } : environment;
+}
+
 export class TransactPluginWeb extends WebPlugin implements TransactPluginPlugin {
   private activeHandle: { close: () => void } | null = null;
   private messageListener: ((event: MessageEvent) => void) | null = null;
@@ -38,7 +46,9 @@ export class TransactPluginWeb extends WebPlugin implements TransactPluginPlugin
 
     const { Atomic } = (await import('@atomicfi/transact-javascript')) as unknown as AtomicTransactSdk;
     const container = config?.theme?.display === 'inline' ? '#atomic-transact-container' : undefined;
-    const environmentOverride = environment?.environment === 'custom' ? environment.transactPath : undefined;
+    const resolvedEnvironment = resolveEnvironment(environment);
+    const environmentOverride =
+      resolvedEnvironment?.environment === 'custom' ? resolvedEnvironment.transactPath : undefined;
     const expectedOrigin = environmentOverride || DEFAULT_TRANSACT_ORIGIN;
 
     // The browser SDK only exposes onInteraction/onDataRequest/onFinish/onClose

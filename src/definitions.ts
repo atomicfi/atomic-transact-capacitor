@@ -32,16 +32,12 @@ export const Scope = {
   PAY_LINK: 'pay-link',
 } as const;
 
-/** Convenience helpers for creating {@link TransactEnvironment} values. */
+/** Environment target for a Transact session. */
 export const Environment = {
-  production: { environment: 'production' } as TransactEnvironment,
-  sandbox: { environment: 'sandbox' } as TransactEnvironment,
-  custom: (transactPath: string, apiPath: string): TransactEnvironment => ({
-    environment: 'custom',
-    transactPath,
-    apiPath,
-  }),
-};
+  PRODUCTION: 'production',
+  SANDBOX: 'sandbox',
+  CUSTOM: 'custom',
+} as const;
 
 /**
  * Deeplink steps for navigating to a specific point in the Transact flow.
@@ -191,6 +187,7 @@ export const DeferredPaymentMethodStrategy = {
 
 export type OperationType = (typeof Operation)[keyof typeof Operation];
 export type ScopeType = (typeof Scope)[keyof typeof Scope];
+export type EnvironmentType = (typeof Environment)[keyof typeof Environment];
 export type LanguageType = (typeof Language)[keyof typeof Language];
 export type HandoffType = (typeof Handoff)[keyof typeof Handoff];
 export type TagType = (typeof Tag)[keyof typeof Tag];
@@ -372,12 +369,22 @@ export interface TransactResult {
 /** Environment configuration for connecting to Atomic services. */
 export interface TransactEnvironment {
   /** Environment target: `'production'`, `'sandbox'`, or `'custom'`. */
-  environment: 'production' | 'sandbox' | 'custom';
+  environment: EnvironmentType;
   /** Custom Transact URL. Required when `environment` is `'custom'`. */
   transactPath?: string;
   /** Custom API URL. Required when `environment` is `'custom'`. */
   apiPath?: string;
 }
+
+/**
+ * Environment to connect to. Pass `Environment.PRODUCTION` / `Environment.SANDBOX`
+ * (or the plain `'production'` / `'sandbox'` string) as a shorthand, or a
+ * `TransactEnvironment` object (required for custom URLs).
+ */
+export type TransactEnvironmentOption =
+  | typeof Environment.PRODUCTION
+  | typeof Environment.SANDBOX
+  | TransactEnvironment;
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Method option types
@@ -387,8 +394,12 @@ export interface TransactEnvironment {
 export interface PresentTransactOptions {
   /** The Transact configuration. */
   config: TransactConfig;
-  /** Environment to connect to. Defaults to production. */
-  environment?: TransactEnvironment;
+  /**
+   * Environment to connect to. Pass `Environment.PRODUCTION` / `Environment.SANDBOX`
+   * (or the plain string), or a `TransactEnvironment` object for custom URLs.
+   * Defaults to production.
+   */
+  environment?: TransactEnvironmentOption;
   /** iOS only. Modal presentation style. */
   presentationStyle?: 'formSheet' | 'fullScreen';
   /**
@@ -403,8 +414,12 @@ export interface PresentTransactOptions {
 export interface PresentActionOptions {
   /** Required. The action ID to present. */
   id: string;
-  /** Environment to connect to. Defaults to production. */
-  environment?: TransactEnvironment;
+  /**
+   * Environment to connect to. Pass `Environment.PRODUCTION` / `Environment.SANDBOX`
+   * (or the plain string), or a `TransactEnvironment` object for custom URLs.
+   * Defaults to production.
+   */
+  environment?: TransactEnvironmentOption;
   /** Visual theme customization. */
   theme?: TransactTheme;
   /** Custom key-value pairs returned in webhook events. */
