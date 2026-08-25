@@ -42,13 +42,16 @@ export const Environment = {
 /**
  * Deeplink steps for navigating to a specific point in the Transact flow.
  *
- * Both steps are supported by UserLink and PayLink.
+ * `login-company` and `search-company` are supported by UserLink and PayLink.
+ * `account` is PayLink-only and requires an `accountId`.
  */
 export const Step = {
   /** Both scopes. Deeplinks to a specific company's login screen. */
   LOGIN_COMPANY: 'login-company',
   /** Both scopes. Deeplinks to the company search screen. */
   SEARCH_COMPANY: 'search-company',
+  /** PayLink. Deeplinks to a specific account/merchant page. Requires `accountId`. */
+  ACCOUNT: 'account',
 } as const;
 
 /**
@@ -309,10 +312,11 @@ export interface TransactDistribution {
 /**
  * Deeplink configuration to navigate directly to a specific step.
  *
- * Both `login-company` and `search-company` are supported by UserLink and PayLink.
+ * `login-company` and `search-company` are supported by UserLink and PayLink.
+ * `account` is PayLink-only and requires `accountId`.
  */
 export interface TransactDeeplink {
-  /** The step to navigate to — `'login-company'` or `'search-company'`. */
+  /** The step to navigate to — see {@link Step}. */
   step?: StepType;
   /** Company ID to deeplink into. */
   companyId?: string;
@@ -320,7 +324,10 @@ export interface TransactDeeplink {
   app?: AppType;
   /** PayLink `manage`-only. Payment IDs to target. */
   payments?: string[];
-  /** PayLink `manage`-only. Account ID to target. */
+  /**
+   * PayLink. Account ID to target. Required when `step` is `'account'`;
+   * also usable with the PayLink `manage` deeplink.
+   */
   accountId?: string;
 }
 

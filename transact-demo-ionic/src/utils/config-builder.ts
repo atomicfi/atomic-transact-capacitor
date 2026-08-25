@@ -43,6 +43,10 @@ export function buildPayLinkConfig(form: PayLinkFormState, settings: Settings): 
       if (form.deeplinkAccountId) deeplink.accountId = form.deeplinkAccountId;
       config.deeplink = deeplink;
     }
+  } else if (form.deeplinkStep === 'account') {
+    const deeplink: TransactDeeplink = { step: form.deeplinkStep };
+    if (form.deeplinkAccountId) deeplink.accountId = form.deeplinkAccountId;
+    config.deeplink = deeplink;
   } else if (form.deeplinkStep) {
     const deeplink: TransactDeeplink = { step: form.deeplinkStep };
     if (form.deeplinkCompanyId) deeplink.companyId = form.deeplinkCompanyId;

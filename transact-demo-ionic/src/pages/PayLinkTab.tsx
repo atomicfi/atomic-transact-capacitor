@@ -153,6 +153,7 @@ const PayLinkTab: React.FC = () => {
                 >
                   <IonSegmentButton value="search-company">Search</IonSegmentButton>
                   <IonSegmentButton value="login-company">Login</IonSegmentButton>
+                  <IonSegmentButton value="account">Account</IonSegmentButton>
                 </IonSegment>
               </IonItem>
               {deeplinkStep === 'login-company' && (
@@ -169,6 +170,17 @@ const PayLinkTab: React.FC = () => {
                       </IonSelectOption>
                     ))}
                   </IonSelect>
+                </IonItem>
+              )}
+              {deeplinkStep === 'account' && (
+                <IonItem lines="none">
+                  <IonInput
+                    label="Account ID"
+                    labelPlacement="stacked"
+                    placeholder="Account ID"
+                    value={deeplinkAccountId}
+                    onIonInput={(e) => setDeeplinkAccountId(e.detail.value ?? '')}
+                  />
                 </IonItem>
               )}
             </>

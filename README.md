@@ -343,15 +343,16 @@ Controls for navigation bar element visibility.
 
 Deeplink configuration to navigate directly to a specific step.
 
-Both `login-company` and `search-company` are supported by UserLink and PayLink.
+`login-company` and `search-company` are supported by UserLink and PayLink.
+`account` is PayLink-only and requires `accountId`.
 
-| Prop            | Type                                          | Description                                                        |
-| --------------- | --------------------------------------------- | ------------------------------------------------------------------ |
-| **`step`**      | <code><a href="#steptype">StepType</a></code> | The step to navigate to — `'login-company'` or `'search-company'`. |
-| **`companyId`** | <code>string</code>                           | Company ID to deeplink into.                                       |
-| **`app`**       | <code><a href="#apptype">AppType</a></code>   | PayLink `manage`-only. App to deeplink into — see {@link App}.     |
-| **`payments`**  | <code>string[]</code>                         | PayLink `manage`-only. Payment IDs to target.                      |
-| **`accountId`** | <code>string</code>                           | PayLink `manage`-only. Account ID to target.                       |
+| Prop            | Type                                          | Description                                                                                                         |
+| --------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **`step`**      | <code><a href="#steptype">StepType</a></code> | The step to navigate to — see {@link Step}.                                                                         |
+| **`companyId`** | <code>string</code>                           | Company ID to deeplink into.                                                                                        |
+| **`app`**       | <code><a href="#apptype">AppType</a></code>   | PayLink `manage`-only. App to deeplink into — see {@link App}.                                                      |
+| **`payments`**  | <code>string[]</code>                         | PayLink `manage`-only. Payment IDs to target.                                                                       |
+| **`accountId`** | <code>string</code>                           | PayLink. Account ID to target. Required when `step` is `'account'`; also usable with the PayLink `manage` deeplink. |
 
 
 #### TransactSearch
