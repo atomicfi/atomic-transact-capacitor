@@ -16,15 +16,42 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+    open-pull-requests-limit: 3
     commit-message:
       prefix: 'chore'
       include: 'scope'
     groups:
       npm-dependencies:
+        applies-to: version-updates
+        patterns:
+          - '*'
+      npm-security:
+        applies-to: security-updates
         patterns:
           - '*'
     allow:
       - dependency-name: '@capacitor/core'
+
+  # Demo app: grouped into a single PR for both version and security updates.
+  # Without this entry Dependabot still opens ungrouped security PRs for the
+  # lockfile it finds here, one per advisory.
+  - package-ecosystem: 'npm'
+    directory: '/transact-demo-ionic'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: 'chore'
+      include: 'scope'
+    groups:
+      demo-npm-dependencies:
+        applies-to: version-updates
+        patterns:
+          - '*'
+      demo-npm-security:
+        applies-to: security-updates
+        patterns:
+          - '*'
 
   - package-ecosystem: 'gradle'
     directory: '/android'
@@ -47,5 +74,10 @@ updates:
       include: 'scope'
     groups:
       github-actions:
+        applies-to: version-updates
+        patterns:
+          - '*'
+      github-actions-security:
+        applies-to: security-updates
         patterns:
           - '*'
