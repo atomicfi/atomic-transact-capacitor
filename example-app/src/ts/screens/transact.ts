@@ -1,7 +1,7 @@
 import type { Screen } from '../router';
 import { navigate } from '../router';
 import { showAlert } from '../utils/alert';
-import { isIOS } from '../utils/platform';
+import { isAndroid, isIOS } from '../utils/platform';
 import {
   TransactPlugin,
   Operation,
@@ -30,6 +30,7 @@ interface State {
   darkMode: boolean;
   debug: boolean;
   presentationStyle: 'formSheet' | 'fullScreen';
+  presentationStyleAndroid: 'formSheet' | 'fullScreen';
   useDeeplink: boolean;
   deeplinkStep: StepType;
   deeplinkCompanyId: string;
@@ -54,6 +55,7 @@ export function createTransactScreen(): Screen {
     darkMode: false,
     debug: false,
     presentationStyle: PresentationStyle.FORM_SHEET,
+    presentationStyleAndroid: PresentationStyle.FULL_SCREEN,
     useDeeplink: false,
     deeplinkStep: Step.LOGIN_COMPANY,
     deeplinkCompanyId: '',
@@ -206,6 +208,7 @@ export function createTransactScreen(): Screen {
         config,
         environment: getEnvironment(),
         presentationStyle: state.presentationStyle,
+        presentationStyleAndroid: state.presentationStyleAndroid,
         debug: state.debug,
       };
 
@@ -310,6 +313,13 @@ export function createTransactScreen(): Screen {
     });
   }
 
+  function setPresentationStyleAndroid(style: 'formSheet' | 'fullScreen') {
+    state.presentationStyleAndroid = style;
+    document.querySelectorAll('#presentation-android-pills .pill').forEach((el) => {
+      el.classList.toggle('selected', el.getAttribute('data-style') === style);
+    });
+  }
+
   function setDeeplinkStep(step: StepType) {
     state.deeplinkStep = step;
     document.querySelectorAll('#deeplink-step-pills .pill').forEach((el) => {
@@ -331,6 +341,17 @@ export function createTransactScreen(): Screen {
           <div class="pill-group" id="presentation-pills">
             <button class="pill selected" data-style="${PresentationStyle.FORM_SHEET}">Form Sheet</button>
             <button class="pill" data-style="${PresentationStyle.FULL_SCREEN}">Full Screen</button>
+          </div>
+        </div>`
+        : '';
+
+      const androidSection = isAndroid()
+        ? `
+        <div class="section-card">
+          <div class="section-title">Android Presentation Style</div>
+          <div class="pill-group" id="presentation-android-pills">
+            <button class="pill" data-style="${PresentationStyle.FORM_SHEET}">Form Sheet</button>
+            <button class="pill selected" data-style="${PresentationStyle.FULL_SCREEN}">Full Screen</button>
           </div>
         </div>`
         : '';
@@ -413,6 +434,7 @@ export function createTransactScreen(): Screen {
           </div>
 
           ${iosSection}
+          ${androidSection}
 
           <div class="section-card">
             <div class="section-title">Deeplink Options (Optional)</div>
@@ -581,6 +603,12 @@ export function createTransactScreen(): Screen {
       document.querySelectorAll('#presentation-pills .pill').forEach((el) => {
         el.addEventListener('click', () => {
           setPresentationStyle(el.getAttribute('data-style')! as 'formSheet' | 'fullScreen');
+        });
+      });
+
+      document.querySelectorAll('#presentation-android-pills .pill').forEach((el) => {
+        el.addEventListener('click', () => {
+          setPresentationStyleAndroid(el.getAttribute('data-style')! as 'formSheet' | 'fullScreen');
         });
       });
 

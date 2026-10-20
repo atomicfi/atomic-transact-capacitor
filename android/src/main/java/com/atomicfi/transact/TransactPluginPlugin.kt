@@ -59,6 +59,7 @@ class TransactPluginPlugin : Plugin() {
 
         val (environmentName, transactPath) = readEnvironment(call)
         val debug = call.getBoolean("debug") ?: false
+        val presentationStyle = parsePresentationStyle(call.getString("presentationStyleAndroid"))
         val wrapperVersion = call.getString("wrapperVersion") ?: ""
         val activity = bridge.activity
         if (activity == null) {
@@ -84,7 +85,8 @@ class TransactPluginPlugin : Plugin() {
             token = token,
             environment = "CUSTOM",
             environmentURL = environmentURL,
-            debug = debug
+            debug = debug,
+            presentationStyle = presentationStyle
         )
 
         activity.runOnUiThread {
@@ -241,6 +243,16 @@ class TransactPluginPlugin : Plugin() {
                 call.resolve()
             } catch (e: Exception) {
                 call.reject("Failed to send data response", e)
+            }
+        }
+    }
+
+    companion object {
+        // Full screen unless JS asks for "formSheet", matching the native SDK's default.
+        internal fun parsePresentationStyle(presentationStyle: String?): Config.PresentationStyle {
+            return when (presentationStyle) {
+                "formSheet" -> Config.PresentationStyle.FORM_SHEET
+                else -> Config.PresentationStyle.FULL_SCREEN
             }
         }
     }

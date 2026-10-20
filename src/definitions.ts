@@ -64,7 +64,10 @@ export const App = {
   SUGGESTIONS: 'suggestions',
 } as const;
 
-/** Native presentation style for the Transact modal (iOS only). */
+/**
+ * Native presentation style for Transact. Used by `presentationStyle` (iOS) and
+ * `presentationStyleAndroid` (Android).
+ */
 export const PresentationStyle = {
   FORM_SHEET: 'formSheet',
   FULL_SCREEN: 'fullScreen',
@@ -409,6 +412,12 @@ export interface PresentTransactOptions {
   environment?: TransactEnvironmentOption;
   /** iOS only. Modal presentation style. */
   presentationStyle?: 'formSheet' | 'fullScreen';
+  /**
+   * Android only. How Android presents Transact. Defaults to `'fullScreen'`.
+   * `'formSheet'` opens it as a modal sheet over the dimmed app: a bottom sheet
+   * on phones, a centered card on large screens. Ignored on iOS and web.
+   */
+  presentationStyleAndroid?: 'formSheet' | 'fullScreen';
   /**
    * Enable debug mode. Forwards native debug logs to `console.log` and makes the
    * Transact webview inspectable (iOS: WKWebView via Safari Web Inspector;
