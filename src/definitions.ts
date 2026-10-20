@@ -64,10 +64,7 @@ export const App = {
   SUGGESTIONS: 'suggestions',
 } as const;
 
-/**
- * Native presentation style for Transact. Used by `presentationStyle` (iOS) and
- * `presentationStyleAndroid` (Android).
- */
+/** Native presentation style for Transact. See {@link PresentTransactOptions.presentationStyle}. */
 export const PresentationStyle = {
   FORM_SHEET: 'formSheet',
   FULL_SCREEN: 'fullScreen',
@@ -199,6 +196,7 @@ export type HandoffType = (typeof Handoff)[keyof typeof Handoff];
 export type TagType = (typeof Tag)[keyof typeof Tag];
 export type StepType = (typeof Step)[keyof typeof Step];
 export type AppType = (typeof App)[keyof typeof App];
+export type PresentationStyleType = (typeof PresentationStyle)[keyof typeof PresentationStyle];
 export type TaskStatusType = (typeof TaskStatus)[keyof typeof TaskStatus];
 export type FailReasonType = (typeof FailReason)[keyof typeof FailReason];
 export type DeferredPaymentMethodStrategyType =
@@ -400,6 +398,17 @@ export type TransactEnvironmentOption =
 // Method option types
 // ──────────────────────────────────────────────────────────────────────────────
 
+/** Per-platform presentation styles. A platform left unset uses `'formSheet'`. */
+export interface PlatformPresentationStyles {
+  /** iOS presentation style. Defaults to `'formSheet'`. */
+  ios?: PresentationStyleType;
+  /** Android presentation style. Defaults to `'formSheet'`. */
+  android?: PresentationStyleType;
+}
+
+/** A presentation style for both platforms, or one per platform. */
+export type PresentationStyleOption = PresentationStyleType | PlatformPresentationStyles;
+
 /** Options for {@link TransactPluginPlugin.presentTransact}. */
 export interface PresentTransactOptions {
   /** The Transact configuration. */
@@ -410,14 +419,14 @@ export interface PresentTransactOptions {
    * Defaults to production.
    */
   environment?: TransactEnvironmentOption;
-  /** iOS only. Modal presentation style. */
-  presentationStyle?: 'formSheet' | 'fullScreen';
   /**
-   * Android only. How Android presents Transact. Defaults to `'fullScreen'`.
-   * `'formSheet'` opens it as a modal sheet over the dimmed app: a bottom sheet
-   * on phones, a centered card on large screens. Ignored on iOS and web.
+   * How Transact is presented. Pass one style for both platforms, or an object to
+   * set each platform separately (e.g. `{ ios: 'formSheet', android: 'fullScreen' }`).
+   * Defaults to `'formSheet'` on both platforms. On Android, `'formSheet'` is a
+   * bottom sheet over the dimmed app on phones and a centered card on large
+   * screens. Ignored on web.
    */
-  presentationStyleAndroid?: 'formSheet' | 'fullScreen';
+  presentationStyle?: PresentationStyleOption;
   /**
    * Enable debug mode. Forwards native debug logs to `console.log` and makes the
    * Transact webview inspectable (iOS: WKWebView via Safari Web Inspector;

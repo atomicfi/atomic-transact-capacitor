@@ -59,7 +59,7 @@ class TransactPluginPlugin : Plugin() {
 
         val (environmentName, transactPath) = readEnvironment(call)
         val debug = call.getBoolean("debug") ?: false
-        val presentationStyle = parsePresentationStyle(call.getString("presentationStyleAndroid"))
+        val presentationStyle = parsePresentationStyle(call.getString("presentationStyle"))
         val wrapperVersion = call.getString("wrapperVersion") ?: ""
         val activity = bridge.activity
         if (activity == null) {
@@ -248,11 +248,11 @@ class TransactPluginPlugin : Plugin() {
     }
 
     companion object {
-        // Full screen unless JS asks for "formSheet", matching the native SDK's default.
+        // Form sheet unless JS asks for "fullScreen", matching the iOS wrapper's default.
         internal fun parsePresentationStyle(presentationStyle: String?): Config.PresentationStyle {
             return when (presentationStyle) {
-                "formSheet" -> Config.PresentationStyle.FORM_SHEET
-                else -> Config.PresentationStyle.FULL_SCREEN
+                "fullScreen" -> Config.PresentationStyle.FULL_SCREEN
+                else -> Config.PresentationStyle.FORM_SHEET
             }
         }
     }

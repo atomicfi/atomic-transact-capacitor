@@ -23,17 +23,17 @@ class PresentationStyleTest {
     }
 
     @Test
-    fun missingStyleDefaultsToFullScreen() {
+    fun missingStyleDefaultsToFormSheet() {
         assertEquals(
-            Config.PresentationStyle.FULL_SCREEN,
+            Config.PresentationStyle.FORM_SHEET,
             TransactPluginPlugin.parsePresentationStyle(null)
         )
     }
 
     @Test
-    fun unknownStyleDefaultsToFullScreen() {
+    fun unknownStyleDefaultsToFormSheet() {
         assertEquals(
-            Config.PresentationStyle.FULL_SCREEN,
+            Config.PresentationStyle.FORM_SHEET,
             TransactPluginPlugin.parsePresentationStyle("pageSheet")
         )
     }

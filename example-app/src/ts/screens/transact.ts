@@ -55,7 +55,7 @@ export function createTransactScreen(): Screen {
     darkMode: false,
     debug: false,
     presentationStyle: PresentationStyle.FORM_SHEET,
-    presentationStyleAndroid: PresentationStyle.FULL_SCREEN,
+    presentationStyleAndroid: PresentationStyle.FORM_SHEET,
     useDeeplink: false,
     deeplinkStep: Step.LOGIN_COMPANY,
     deeplinkCompanyId: '',
@@ -207,8 +207,7 @@ export function createTransactScreen(): Screen {
       const options: PresentTransactOptions = {
         config,
         environment: getEnvironment(),
-        presentationStyle: state.presentationStyle,
-        presentationStyleAndroid: state.presentationStyleAndroid,
+        presentationStyle: { ios: state.presentationStyle, android: state.presentationStyleAndroid },
         debug: state.debug,
       };
 
@@ -350,8 +349,8 @@ export function createTransactScreen(): Screen {
         <div class="section-card">
           <div class="section-title">Android Presentation Style</div>
           <div class="pill-group" id="presentation-android-pills">
-            <button class="pill" data-style="${PresentationStyle.FORM_SHEET}">Form Sheet</button>
-            <button class="pill selected" data-style="${PresentationStyle.FULL_SCREEN}">Full Screen</button>
+            <button class="pill selected" data-style="${PresentationStyle.FORM_SHEET}">Form Sheet</button>
+            <button class="pill" data-style="${PresentationStyle.FULL_SCREEN}">Full Screen</button>
           </div>
         </div>`
         : '';
