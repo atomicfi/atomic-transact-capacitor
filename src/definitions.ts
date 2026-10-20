@@ -398,11 +398,11 @@ export type TransactEnvironmentOption =
 // Method option types
 // ──────────────────────────────────────────────────────────────────────────────
 
-/** Per-platform presentation styles. A platform left unset uses `'formSheet'`. */
+/** Per-platform presentation styles. A platform left unset uses `PresentationStyle.FORM_SHEET`. */
 export interface PlatformPresentationStyles {
-  /** iOS presentation style. Defaults to `'formSheet'`. */
+  /** iOS presentation style. Defaults to `PresentationStyle.FORM_SHEET`. */
   ios?: PresentationStyleType;
-  /** Android presentation style. Defaults to `'formSheet'`. */
+  /** Android presentation style. Defaults to `PresentationStyle.FORM_SHEET`. */
   android?: PresentationStyleType;
 }
 
@@ -420,11 +420,12 @@ export interface PresentTransactOptions {
    */
   environment?: TransactEnvironmentOption;
   /**
-   * How Transact is presented. Pass one style for both platforms, or an object to
-   * set each platform separately (e.g. `{ ios: 'formSheet', android: 'fullScreen' }`).
-   * Defaults to `'formSheet'` on both platforms. On Android, `'formSheet'` is a
-   * bottom sheet over the dimmed app on phones and a centered card on large
-   * screens. Ignored on web.
+   * How Transact is presented. Pass one `PresentationStyle` for both platforms
+   * (e.g. `PresentationStyle.FULL_SCREEN`), or an object to set each platform
+   * separately (e.g. `{ ios: PresentationStyle.FORM_SHEET, android: PresentationStyle.FULL_SCREEN }`).
+   * Defaults to `PresentationStyle.FORM_SHEET` on both platforms. On Android, the
+   * form sheet is a bottom sheet over the dimmed app on phones and a centered card
+   * on large screens. Ignored on web.
    */
   presentationStyle?: PresentationStyleOption;
   /**
