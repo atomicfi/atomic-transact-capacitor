@@ -59,6 +59,7 @@ class TransactPluginPlugin : Plugin() {
 
         val (environmentName, transactPath) = readEnvironment(call)
         val debug = call.getBoolean("debug") ?: false
+        val presentationStyle = parsePresentationStyle(call.getString("presentationStyle"))
         val wrapperVersion = call.getString("wrapperVersion") ?: ""
         val activity = bridge.activity
         if (activity == null) {
@@ -84,7 +85,8 @@ class TransactPluginPlugin : Plugin() {
             token = token,
             environment = "CUSTOM",
             environmentURL = environmentURL,
-            debug = debug
+            debug = debug,
+            presentationStyle = presentationStyle
         )
 
         activity.runOnUiThread {
@@ -241,6 +243,16 @@ class TransactPluginPlugin : Plugin() {
                 call.resolve()
             } catch (e: Exception) {
                 call.reject("Failed to send data response", e)
+            }
+        }
+    }
+
+    companion object {
+        // Form sheet unless JS asks for "fullScreen", matching the iOS wrapper's default.
+        internal fun parsePresentationStyle(presentationStyle: String?): Config.PresentationStyle {
+            return when (presentationStyle) {
+                "fullScreen" -> Config.PresentationStyle.FULL_SCREEN
+                else -> Config.PresentationStyle.FORM_SHEET
             }
         }
     }

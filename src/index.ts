@@ -1,16 +1,39 @@
-import { registerPlugin } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 
 import { version as wrapperVersion } from '../package.json';
 
-import type { PresentTransactOptions, TransactPluginPlugin, TransactResult } from './definitions';
+import type {
+  PresentationStyleOption,
+  PresentationStyleType,
+  PresentTransactOptions,
+  TransactPluginPlugin,
+  TransactResult,
+} from './definitions';
 
+// Native receives a single style string for its own platform (or none, to keep the
+// platform default); the per-platform object form is resolved here.
 type TransactPluginBridge = Omit<TransactPluginPlugin, 'presentTransact'> & {
-  presentTransact(options: PresentTransactOptions & { wrapperVersion: string }): Promise<TransactResult>;
+  presentTransact(
+    options: Omit<PresentTransactOptions, 'presentationStyle'> & {
+      presentationStyle?: PresentationStyleType;
+      wrapperVersion: string;
+    },
+  ): Promise<TransactResult>;
 };
 
 const rawPlugin = registerPlugin<TransactPluginBridge>('TransactPlugin', {
   web: () => import('./web').then((m) => new m.TransactPluginWeb()),
 });
+
+function resolvePresentationStyle(
+  style: PresentationStyleOption | undefined,
+  platform: string,
+): PresentationStyleType | undefined {
+  if (typeof style === 'string') return style;
+  if (platform === 'ios') return style?.ios;
+  if (platform === 'android') return style?.android;
+  return undefined;
+}
 
 async function withDebugLogging<T>(debug: boolean | undefined, fn: () => Promise<T>): Promise<T> {
   if (!debug) return fn();
@@ -39,7 +62,13 @@ const TransactPlugin: TransactPluginPlugin = new Proxy(rawPlugin, {
   get(target, prop, receiver) {
     if (prop === 'presentTransact') {
       return (options: PresentTransactOptions): Promise<TransactResult> =>
-        withDebugLogging(options?.debug, () => target.presentTransact({ ...options, wrapperVersion }));
+        withDebugLogging(options?.debug, () =>
+          target.presentTransact({
+            ...options,
+            presentationStyle: resolvePresentationStyle(options?.presentationStyle, Capacitor.getPlatform()),
+            wrapperVersion,
+          }),
+        );
     }
     return Reflect.get(target, prop, receiver);
   },

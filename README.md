@@ -249,12 +249,12 @@ Result returned when a Transact flow finishes or is closed.
 
 Options for {@link TransactPluginPlugin.presentTransact}.
 
-| Prop                    | Type                                                                            | Description                                                                                                                                                                                                                                  |
-| ----------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`config`**            | <code><a href="#transactconfig">TransactConfig</a></code>                       | The Transact configuration.                                                                                                                                                                                                                  |
-| **`environment`**       | <code><a href="#transactenvironmentoption">TransactEnvironmentOption</a></code> | Environment to connect to. Pass `Environment.PRODUCTION` / `Environment.SANDBOX` (or the plain string), or a <a href="#transactenvironment">`TransactEnvironment`</a> object for custom URLs. Defaults to production.                        |
-| **`presentationStyle`** | <code>'formSheet' \| 'fullScreen'</code>                                        | iOS only. Modal presentation style.                                                                                                                                                                                                          |
-| **`debug`**             | <code>boolean</code>                                                            | Enable debug mode. Forwards native debug logs to `console.log` and makes the Transact webview inspectable (iOS: WKWebView via Safari Web Inspector; Android: WebView via chrome://inspect). Logs print automatically — no listener required. |
+| Prop                    | Type                                                                            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ----------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`config`**            | <code><a href="#transactconfig">TransactConfig</a></code>                       | The Transact configuration.                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **`environment`**       | <code><a href="#transactenvironmentoption">TransactEnvironmentOption</a></code> | Environment to connect to. Pass `Environment.PRODUCTION` / `Environment.SANDBOX` (or the plain string), or a <a href="#transactenvironment">`TransactEnvironment`</a> object for custom URLs. Defaults to production.                                                                                                                                                                                                                                  |
+| **`presentationStyle`** | <code><a href="#presentationstyleoption">PresentationStyleOption</a></code>     | How Transact is presented. Pass one `PresentationStyle` for both platforms (e.g. `PresentationStyle.FULL_SCREEN`), or an object to set each platform separately (e.g. `{ ios: PresentationStyle.FORM_SHEET, android: PresentationStyle.FULL_SCREEN }`). Defaults to `PresentationStyle.FORM_SHEET` on both platforms. On Android, the form sheet is a bottom sheet over the dimmed app on phones and a centered card on large screens. Ignored on web. |
+| **`debug`**             | <code>boolean</code>                                                            | Enable debug mode. Forwards native debug logs to `console.log` and makes the Transact webview inspectable (iOS: WKWebView via Safari Web Inspector; Android: WebView via chrome://inspect). Logs print automatically — no listener required.                                                                                                                                                                                                           |
 
 
 #### TransactConfig
@@ -403,6 +403,16 @@ Environment configuration for connecting to Atomic services.
 | **`environment`**  | <code><a href="#environmenttype">EnvironmentType</a></code> | Environment target: `'production'`, `'sandbox'`, or `'custom'`. |
 | **`transactPath`** | <code>string</code>                                         | Custom Transact URL. Required when `environment` is `'custom'`. |
 | **`apiPath`**      | <code>string</code>                                         | Custom API URL. Required when `environment` is `'custom'`.      |
+
+
+#### PlatformPresentationStyles
+
+Per-platform presentation styles. A platform left unset uses `PresentationStyle.FORM_SHEET`.
+
+| Prop          | Type                                                                    | Description                                                             |
+| ------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **`ios`**     | <code><a href="#presentationstyletype">PresentationStyleType</a></code> | iOS presentation style. Defaults to `PresentationStyle.FORM_SHEET`.     |
+| **`android`** | <code><a href="#presentationstyletype">PresentationStyleType</a></code> | Android presentation style. Defaults to `PresentationStyle.FORM_SHEET`. |
 
 
 #### PauseTransactOptions
@@ -632,6 +642,18 @@ Environment to connect to. Pass `Environment.PRODUCTION` / `Environment.SANDBOX`
 #### EnvironmentType
 
 <code>(typeof Environment)[keyof typeof Environment]</code>
+
+
+#### PresentationStyleOption
+
+A presentation style for both platforms, or one per platform.
+
+<code><a href="#presentationstyletype">PresentationStyleType</a> | <a href="#platformpresentationstyles">PlatformPresentationStyles</a></code>
+
+
+#### PresentationStyleType
+
+<code>(typeof PresentationStyle)[keyof typeof PresentationStyle]</code>
 
 
 #### TaskStatusType
