@@ -587,7 +587,9 @@ Payload for the `onClose` event.
 
 Construct a type with a set of properties K of type T
 
-<code>{ [P in K]: T; }</code>
+<code>{
+ [P in K]: T;
+ }</code>
 
 
 #### ScopeType
@@ -666,3 +668,7 @@ A presentation style for both platforms, or one per platform.
 <code>(typeof FailReason)[keyof typeof FailReason]</code>
 
 </docgen-api>
+
+## Contributing
+
+Atomic's SDK team maintains this SDK and makes all changes to its code. To report a bug, ask a question or request a feature, open a [GitHub issue](https://github.com/atomicfi/atomic-transact-capacitor/issues/new); for a bug, also tell your Atomic account manager. See [CONTRIBUTING.md](CONTRIBUTING.md) for what to include, and [AGENTS.md](AGENTS.md) if you use an AI coding agent.
