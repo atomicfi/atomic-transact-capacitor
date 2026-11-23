@@ -10,6 +10,7 @@
     "android/src/main/",
     "android/build.gradle",
     "dist/",
+    "ios/frameworks",
     "ios/Sources",
     "ios/Tests",
     "Package.swift",
