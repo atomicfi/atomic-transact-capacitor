@@ -69,9 +69,7 @@ class TransactPluginPlugin : Plugin() {
 
         savedCall = call
 
-        // Add platform info using SDK helper with `capacitor-<wrapper version>` suffix.
-        val platformMap = Config.Platform.suffixed("capacitor-$wrapperVersion").encode()
-        configObj.put("platform", JSONObject(platformMap as Map<String, Any?>))
+        configObj.put("platform", JSONObject(platform(wrapperVersion).encode()))
 
         // Base64 encode the config for the token-based constructor
         val token = Base64.encodeToString(
@@ -248,6 +246,18 @@ class TransactPluginPlugin : Plugin() {
     }
 
     companion object {
+        // The SDK's platform for a Capacitor app: the `capacitor-<wrapper version>` suffix plus the
+        // Capacitor version, which build.gradle reads from @capacitor/android at build time.
+        internal fun platform(
+            wrapperVersion: String,
+            capacitorVersion: String? = BuildConfig.CAPACITOR_VERSION
+        ): Config.Platform {
+            return Config.Platform.suffixed(
+                "capacitor-$wrapperVersion",
+                Config.Platform.HostFramework("capacitor", capacitorVersion)
+            )
+        }
+
         // Form sheet unless JS asks for "fullScreen", matching the iOS wrapper's default.
         internal fun parsePresentationStyle(presentationStyle: String?): Config.PresentationStyle {
             return when (presentationStyle) {
