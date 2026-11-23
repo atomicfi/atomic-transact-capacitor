@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = [
     "ios/frameworks/AtomicTransact.xcframework",
     "ios/frameworks/MuppetIOS.xcframework",
-    "ios/frameworks/QuantumIOS.xcframework"
+    "ios/frameworks/Uplink.xcframework"
   ]
   s.swift_version = '5.1'
 end
