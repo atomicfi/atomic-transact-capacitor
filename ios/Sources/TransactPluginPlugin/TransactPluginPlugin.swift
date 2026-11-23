@@ -91,8 +91,7 @@ public class TransactPluginPlugin: CAPPlugin, CAPBridgedPlugin {
                     json["language"] = "en"
                 }
 
-                // Add platform info using SDK defaults with -capacitor-<wrapper version> suffix
-                json["platform"] = AtomicConfig.Platform(suffixed: "capacitor-\(wrapperVersion)").encode()
+                json["platform"] = CapacitorHost.platform(wrapperVersion: wrapperVersion)
 
                 guard let data = try? JSONSerialization.data(withJSONObject: json, options: []) else {
                     call.reject("Failed to serialize config")
